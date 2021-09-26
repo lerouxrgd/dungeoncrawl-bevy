@@ -1,0 +1,9 @@
+[package]
+name = "dungeoncrawl"
+version = "0.1.0"
+edition = "2018"
+
+[dependencies]
+bevy = { version = "0.5", features = ["dynamic"] }
+bevy_tilemap = "0.4"
+rand = "0.8"
