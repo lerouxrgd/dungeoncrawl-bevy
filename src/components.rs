@@ -1,6 +1,12 @@
 use crate::prelude::*;
 
 #[derive(Default)]
+pub struct Render {
+    pub sprite_index: usize,
+    pub sprite_order: usize,
+}
+
+#[derive(Default)]
 pub struct Player;
 
 #[derive(Bundle)]
@@ -11,7 +17,11 @@ pub struct PlayerBundle {
 }
 
 #[derive(Default)]
-pub struct Render {
-    pub sprite_index: usize,
-    pub sprite_order: usize,
+pub struct Enemy;
+
+#[derive(Bundle)]
+pub struct EnemyBundle {
+    pub enemy: Enemy,
+    pub position: Point,
+    pub render: Render,
 }

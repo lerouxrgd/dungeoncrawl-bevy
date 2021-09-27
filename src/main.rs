@@ -52,7 +52,7 @@ fn setup(
 
     let texture_atlas_handle = texture_atlases.add(texture_atlas);
 
-    // setup tilemap
+    // setup map
 
     let mut rng = rand::thread_rng();
     let map_builder = MapBuilder::new(&mut rng);
@@ -63,10 +63,24 @@ fn setup(
         .texture_dimensions(32, 32)
         .texture_atlas(texture_atlas_handle)
         .auto_chunk()
+        .add_layer(
+            TilemapLayer {
+                kind: LayerKind::Sparse,
+                ..Default::default()
+            },
+            1,
+        )
+        .add_layer(
+            TilemapLayer {
+                kind: LayerKind::Sparse,
+                ..Default::default()
+            },
+            2,
+        )
         .finish()
         .unwrap();
 
-    let mut tiles = map_builder
+    let tiles = map_builder
         .map_spec
         .tiles
         .iter()
@@ -84,51 +98,26 @@ fn setup(
                 ),
                 sprite_index,
                 sprite_order: 0,
-                tint: Color::WHITE, // tint and alpha of the tile. White means no change.
+                tint: Color::WHITE,
             }
         })
         .collect::<Vec<_>>();
-
-    tiles.push(Tile {
-        point: (
-            map_builder.player_start.x - CAMERA_OFFSET_X,
-            map_builder.player_start.y - CAMERA_OFFSET_Y,
-        ),
-        sprite_index: to_cp437('@'),
-        sprite_order: 1,
-        tint: Color::WHITE,
-    });
-
     tilemap.insert_tiles(tiles).unwrap();
 
-    let tilemap_components = TilemapBundle {
-        tilemap,
-        visible: Visible {
-            is_visible: true,
-            is_transparent: true,
-        },
-        transform: Default::default(),
-        global_transform: Default::default(),
-    };
-
     commands.insert_resource(map_builder.map_spec);
-    commands
-        .spawn()
-        .insert_bundle(tilemap_components)
-        .insert(Timer::from_seconds(0.075, true));
 
-    // setup camera
+    // spawn entities
 
-    let mut camera = OrthographicCameraBundle::new_2d();
+    spawn_player(&mut commands, map_builder.player_start, &mut tilemap);
 
-    camera.transform.translation.x =
-        (map_builder.player_start.x as f32 - CAMERA_OFFSET_X as f32) * 32.;
-    camera.transform.translation.y =
-        (map_builder.player_start.y as f32 - CAMERA_OFFSET_Y as f32) * 32.;
+    map_builder
+        .rooms
+        .iter()
+        .skip(1)
+        .map(|r| r.center())
+        .for_each(|pos| spawn_monster(&mut commands, &mut rng, pos, &mut tilemap));
 
-    commands.spawn_bundle(camera);
+    spawn_tilemap(&mut commands, tilemap);
 
-    // setup player
-
-    spawn_player(&mut commands, map_builder.player_start);
+    spawn_camera(&mut commands, map_builder.player_start);
 }

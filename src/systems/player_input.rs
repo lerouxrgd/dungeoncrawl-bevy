@@ -4,11 +4,11 @@ pub fn player_input(
     map_spec: Res<MapSpec>,
     keyboard_input: Res<Input<KeyCode>>,
     time: Res<Time>,
-    mut map_query: Query<(&mut Tilemap, &mut Timer)>,
+    mut tilemap_query: Query<(&mut Tilemap, &mut Timer)>,
     mut player_query: Query<(&Player, &mut Point, &Render)>,
     mut camera_query: Query<(&Camera, &mut Transform)>,
 ) {
-    let (mut tile_map, mut timer) = map_query.single_mut().unwrap();
+    let (mut tilemap, mut timer) = tilemap_query.single_mut().unwrap();
 
     timer.tick(time.delta());
     if !timer.finished() {
@@ -36,14 +36,14 @@ pub fn player_input(
             camera_translation.x += delta.x as f32 * 32.;
             camera_translation.y += delta.y as f32 * 32.;
 
-            move_sprite(&mut tile_map, prev_pos, *pos, render);
+            move_sprite(&mut tilemap, prev_pos, *pos, render);
         }
     }
 }
 
-fn move_sprite(tile_map: &mut Tilemap, prev_pos: Point, new_pos: Point, render: &Render) {
+fn move_sprite(tilemap: &mut Tilemap, prev_pos: Point, new_pos: Point, render: &Render) {
     // We need to first remove where we were prior.
-    tile_map
+    tilemap
         .clear_tile(
             (prev_pos.x - CAMERA_OFFSET_X, prev_pos.y - CAMERA_OFFSET_Y),
             render.sprite_order,
@@ -58,5 +58,5 @@ fn move_sprite(tile_map: &mut Tilemap, prev_pos: Point, new_pos: Point, render: 
         ..Default::default()
     };
 
-    tile_map.insert_tile(tile).unwrap();
+    tilemap.insert_tile(tile).unwrap();
 }
