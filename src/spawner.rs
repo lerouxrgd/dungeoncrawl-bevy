@@ -11,10 +11,7 @@ pub fn spawn_tilemap(commands: &mut Commands, tilemap: Tilemap) {
         global_transform: Default::default(),
     };
 
-    commands
-        .spawn()
-        .insert_bundle(tilemap_components)
-        .insert(Timer::from_seconds(0.075, true));
+    commands.spawn().insert_bundle(tilemap_components);
 }
 
 pub fn spawn_camera(commands: &mut Commands, player_start: Point) {
@@ -66,6 +63,7 @@ pub fn spawn_monster(
             sprite_index,
             sprite_order: 2,
         },
+        moving_randomly: MovingRandomly,
     });
 
     tilemap

@@ -24,4 +24,8 @@ pub struct EnemyBundle {
     pub enemy: Enemy,
     pub position: Point,
     pub render: Render,
+    pub moving_randomly: MovingRandomly,
 }
+
+#[derive(Default)]
+pub struct MovingRandomly;

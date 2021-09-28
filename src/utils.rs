@@ -1,5 +1,5 @@
 #![allow(dead_code)]
-//! Port of some bracketlib helper structs
+//! Some helper structs/functions taken from bracketlib
 
 use std::collections::HashSet;
 use std::convert::TryInto;

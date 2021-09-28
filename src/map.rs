@@ -134,3 +134,23 @@ impl MapBuilder {
         }
     }
 }
+
+pub fn move_sprite(tilemap: &mut Tilemap, prev_pos: Point, new_pos: Point, render: &Render) {
+    // We need to first remove where we were prior.
+    tilemap
+        .clear_tile(
+            (prev_pos.x - CAMERA_OFFSET_X, prev_pos.y - CAMERA_OFFSET_Y),
+            render.sprite_order,
+        )
+        .unwrap();
+
+    // We then need to update where we are going!
+    let tile = Tile {
+        point: (new_pos.x - CAMERA_OFFSET_X, new_pos.y - CAMERA_OFFSET_Y),
+        sprite_index: render.sprite_index,
+        sprite_order: render.sprite_order,
+        ..Default::default()
+    };
+
+    tilemap.insert_tile(tile).unwrap();
+}

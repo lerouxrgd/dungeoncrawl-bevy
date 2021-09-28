@@ -2,9 +2,12 @@ mod components;
 mod map;
 mod spawner;
 mod systems;
+mod turn_state;
 mod utils;
 
 mod prelude {
+    pub use bevy::input::keyboard::KeyboardInput;
+    pub use bevy::input::ElementState;
     pub use bevy::prelude::*;
     pub use bevy::render::camera::Camera;
     pub use bevy_tilemap::prelude::*;
@@ -19,6 +22,7 @@ mod prelude {
     pub use crate::map::*;
     pub use crate::spawner::*;
     pub use crate::systems::*;
+    pub use crate::turn_state::*;
     pub use crate::utils::*;
 }
 
@@ -33,7 +37,8 @@ fn main() {
     })
     .add_plugins(DefaultPlugins)
     .add_plugins(TilemapDefaultPlugins)
-    .add_startup_system(setup.system());
+    .add_startup_system(setup.system())
+    .add_state(TurnState::AwaitingInput);
 
     add_systems(&mut app);
 
@@ -55,7 +60,11 @@ fn setup(
     // setup map
 
     let mut rng = rand::thread_rng();
-    let map_builder = MapBuilder::new(&mut rng);
+    let MapBuilder {
+        map_spec,
+        rooms,
+        player_start,
+    } = MapBuilder::new(&mut rng);
 
     let mut tilemap = Tilemap::builder()
         .dimensions(TILEMAP_WIDTH as u32, TILEMAP_HEIGHT as u32)
@@ -80,8 +89,7 @@ fn setup(
         .finish()
         .unwrap();
 
-    let tiles = map_builder
-        .map_spec
+    let tiles = map_spec
         .tiles
         .iter()
         .enumerate()
@@ -104,14 +112,15 @@ fn setup(
         .collect::<Vec<_>>();
     tilemap.insert_tiles(tiles).unwrap();
 
-    commands.insert_resource(map_builder.map_spec);
+    // insert resources
+
+    commands.insert_resource(map_spec);
 
     // spawn entities
 
-    spawn_player(&mut commands, map_builder.player_start, &mut tilemap);
+    spawn_player(&mut commands, player_start, &mut tilemap);
 
-    map_builder
-        .rooms
+    rooms
         .iter()
         .skip(1)
         .map(|r| r.center())
@@ -119,5 +128,5 @@ fn setup(
 
     spawn_tilemap(&mut commands, tilemap);
 
-    spawn_camera(&mut commands, map_builder.player_start);
+    spawn_camera(&mut commands, player_start);
 }
