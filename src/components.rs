@@ -1,6 +1,6 @@
 use crate::prelude::*;
 
-#[derive(Default)]
+#[derive(Default, Clone, Copy)]
 pub struct Render {
     pub sprite_index: usize,
     pub sprite_order: usize,
@@ -29,3 +29,10 @@ pub struct EnemyBundle {
 
 #[derive(Default)]
 pub struct MovingRandomly;
+
+pub struct WantsToMove {
+    pub entity: Entity,
+    pub origin: Point,
+    pub destination: Point,
+    pub render: Render,
+}

@@ -24,20 +24,23 @@ pub fn spawn_camera(commands: &mut Commands, player_start: Point) {
 }
 
 pub fn spawn_player(commands: &mut Commands, position: Point, tilemap: &mut Tilemap) {
+    let sprite_index = to_cp437('@');
+    let sprite_order = 2;
+
     commands.spawn().insert_bundle(PlayerBundle {
         player: Player,
         position,
         render: Render {
-            sprite_index: to_cp437('@'),
-            sprite_order: 1,
+            sprite_index,
+            sprite_order,
         },
     });
 
     tilemap
         .insert_tile(Tile {
             point: (position.x - CAMERA_OFFSET_X, position.y - CAMERA_OFFSET_Y),
-            sprite_index: to_cp437('@'),
-            sprite_order: 1,
+            sprite_index,
+            sprite_order,
             tint: Color::WHITE,
         })
         .unwrap();
@@ -55,13 +58,14 @@ pub fn spawn_monster(
         2 => to_cp437('o'),
         _ => to_cp437('g'),
     };
+    let sprite_order = 1;
 
     commands.spawn().insert_bundle(EnemyBundle {
         enemy: Enemy,
         position,
         render: Render {
             sprite_index,
-            sprite_order: 2,
+            sprite_order,
         },
         moving_randomly: MovingRandomly,
     });
@@ -70,7 +74,7 @@ pub fn spawn_monster(
         .insert_tile(Tile {
             point: (position.x - CAMERA_OFFSET_X, position.y - CAMERA_OFFSET_Y),
             sprite_index,
-            sprite_order: 2,
+            sprite_order,
             tint: Color::WHITE,
         })
         .unwrap();

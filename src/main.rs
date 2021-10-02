@@ -6,6 +6,7 @@ mod turn_state;
 mod utils;
 
 mod prelude {
+    pub use bevy::app::Events;
     pub use bevy::input::keyboard::KeyboardInput;
     pub use bevy::input::ElementState;
     pub use bevy::prelude::*;
@@ -38,7 +39,8 @@ fn main() {
     .add_plugins(DefaultPlugins)
     .add_plugins(TilemapDefaultPlugins)
     .add_startup_system(setup.system())
-    .add_state(TurnState::AwaitingInput);
+    .add_state(TurnState::AwaitingInput)
+    .init_resource::<Events<WantsToMove>>();
 
     add_systems(&mut app);
 
@@ -50,14 +52,14 @@ fn setup(
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 ) {
-    // setup textures
+    // Setup textures
 
     let texture_handle = asset_server.load("dungeonfont.png");
     let texture_atlas = TextureAtlas::from_grid(texture_handle, Vec2::new(32.0, 32.0), 16, 16);
 
     let texture_atlas_handle = texture_atlases.add(texture_atlas);
 
-    // setup map
+    // Setup map
 
     let mut rng = rand::thread_rng();
     let MapBuilder {
@@ -112,11 +114,11 @@ fn setup(
         .collect::<Vec<_>>();
     tilemap.insert_tiles(tiles).unwrap();
 
-    // insert resources
+    // Insert resources
 
     commands.insert_resource(map_spec);
 
-    // spawn entities
+    // Spawn entities
 
     spawn_player(&mut commands, player_start, &mut tilemap);
 
