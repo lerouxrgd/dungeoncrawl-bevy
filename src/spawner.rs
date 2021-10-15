@@ -34,6 +34,10 @@ pub fn spawn_player(commands: &mut Commands, position: Point, tilemap: &mut Tile
             sprite_index,
             sprite_order,
         },
+        health: Health {
+            current: 20,
+            max: 20,
+        },
     });
 
     tilemap
@@ -52,13 +56,19 @@ pub fn spawn_monster(
     position: Point,
     tilemap: &mut Tilemap,
 ) {
-    let sprite_index = match rng.gen_range(0..4) {
-        0 => to_cp437('E'),
-        1 => to_cp437('O'),
-        2 => to_cp437('o'),
-        _ => to_cp437('g'),
-    };
+    fn goblin() -> (i32, String, usize) {
+        (1, "Goblin".to_string(), to_cp437('g'))
+    }
+
+    fn orc() -> (i32, String, usize) {
+        (2, "Orc".to_string(), to_cp437('o'))
+    }
+
     let sprite_order = 1;
+    let (hp, name, sprite_index) = match rng.gen_range(1..=10) {
+        1..=8 => goblin(),
+        _ => orc(),
+    };
 
     commands.spawn().insert_bundle(EnemyBundle {
         enemy: Enemy,
@@ -68,6 +78,11 @@ pub fn spawn_monster(
             sprite_order,
         },
         moving_randomly: MovingRandomly,
+        health: Health {
+            current: hp,
+            max: hp,
+        },
+        name: Name(name),
     });
 
     tilemap
@@ -78,4 +93,57 @@ pub fn spawn_monster(
             tint: Color::WHITE,
         })
         .unwrap();
+}
+
+pub fn spawn_hud(commands: &mut Commands, asset_server: &AssetServer) {
+    let health_bar = GeometryBuilder::build_as(
+        &shapes::Rectangle::default(),
+        ShapeColors::new(Color::RED),
+        DrawMode::Fill(FillOptions::default()),
+        Transform::default(),
+    );
+
+    commands
+        .spawn_bundle(Text2dBundle {
+            text: Text::with_section(
+                "Health: {} / {}",
+                TextStyle {
+                    font: asset_server.load("BigBlue_Terminal_437TT.TTF"),
+                    font_size: 10.0,
+                    color: Color::WHITE,
+                },
+                TextAlignment {
+                    vertical: VerticalAlign::Bottom,
+                    horizontal: HorizontalAlign::Center,
+                },
+            ),
+            ..Default::default()
+        })
+        .insert(Hud)
+        .insert(HealthText)
+        .with_children(|parent| {
+            parent
+                .spawn_bundle(health_bar)
+                .insert(Hud)
+                .insert(HealthBar);
+
+            parent
+                .spawn_bundle(Text2dBundle {
+                    text: Text::with_section(
+                        "Explore the Dungeon. Cursor keys to move.",
+                        TextStyle {
+                            font: asset_server.load("BigBlue_Terminal_437TT.TTF"),
+                            font_size: 10.0,
+                            color: Color::WHITE,
+                        },
+                        TextAlignment {
+                            vertical: VerticalAlign::Bottom,
+                            horizontal: HorizontalAlign::Center,
+                        },
+                    ),
+                    ..Default::default()
+                })
+                .insert(Hud)
+                .insert(InfoText);
+        });
 }

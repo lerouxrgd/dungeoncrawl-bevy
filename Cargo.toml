@@ -5,5 +5,7 @@ edition = "2018"
 
 [dependencies]
 bevy = { version = "0.5", features = ["dynamic"] }
+bevy_prototype_lyon = "0.3"
 bevy_tilemap = "0.4"
+lyon_tessellation = "0.17"
 rand = "0.8"

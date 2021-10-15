@@ -6,7 +6,7 @@ pub fn movement(
     mut commands: Commands,
     mut tilemap_query: Query<&mut Tilemap>,
     player_query: Query<Entity, With<Player>>,
-    mut camera_query: Query<(&Camera, &mut Transform)>,
+    mut camera_query: Query<&mut Transform, With<Camera>>,
 ) {
     let mut tilemap = tilemap_query.single_mut().unwrap();
 
@@ -23,7 +23,7 @@ pub fn movement(
 
             let player = player_query.single().unwrap();
             if entity == player {
-                let (_, mut camera_transform) = camera_query.single_mut().unwrap();
+                let mut camera_transform = camera_query.single_mut().unwrap();
                 let camera_translation = &mut camera_transform.translation;
                 camera_translation.x = (destination.x - CAMERA_OFFSET_X) as f32 * 32.;
                 camera_translation.y = (destination.y - CAMERA_OFFSET_Y) as f32 * 32.;

@@ -14,6 +14,7 @@ pub struct PlayerBundle {
     pub player: Player,
     pub position: Point,
     pub render: Render,
+    pub health: Health,
 }
 
 #[derive(Default)]
@@ -25,6 +26,8 @@ pub struct EnemyBundle {
     pub position: Point,
     pub render: Render,
     pub moving_randomly: MovingRandomly,
+    pub health: Health,
+    pub name: Name,
 }
 
 #[derive(Default)]
@@ -36,3 +39,27 @@ pub struct WantsToMove {
     pub destination: Point,
     pub render: Render,
 }
+
+#[derive(Default)]
+pub struct Health {
+    pub current: i32,
+    pub max: i32,
+}
+
+#[derive(Default)]
+pub struct Name(pub String);
+
+#[derive(Default)]
+pub struct Hud;
+
+#[derive(Default)]
+pub struct HealthText;
+
+#[derive(Default)]
+pub struct HealthBar;
+
+#[derive(Default)]
+pub struct InfoText;
+
+#[derive(Default)]
+pub struct TooltipText;

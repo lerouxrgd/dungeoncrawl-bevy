@@ -10,8 +10,11 @@ mod prelude {
     pub use bevy::input::keyboard::KeyboardInput;
     pub use bevy::input::ElementState;
     pub use bevy::prelude::*;
-    pub use bevy::render::camera::Camera;
+    pub use bevy::render::camera::{Camera, OrthographicProjection};
+    pub use bevy::text::Text2dSize;
+    pub use bevy_prototype_lyon::prelude::*;
     pub use bevy_tilemap::prelude::*;
+    pub use lyon_tessellation::path::Path;
     pub use rand::Rng;
 
     pub const TILEMAP_WIDTH: i32 = 80;
@@ -38,6 +41,7 @@ fn main() {
     })
     .add_plugins(DefaultPlugins)
     .add_plugins(TilemapDefaultPlugins)
+    .add_plugin(ShapePlugin)
     .add_startup_system(setup.system())
     .add_state(TurnState::AwaitingInput)
     .init_resource::<Events<WantsToMove>>();
@@ -121,14 +125,13 @@ fn setup(
     // Spawn entities
 
     spawn_player(&mut commands, player_start, &mut tilemap);
-
     rooms
         .iter()
         .skip(1)
         .map(|r| r.center())
         .for_each(|pos| spawn_monster(&mut commands, &mut rng, pos, &mut tilemap));
-
     spawn_tilemap(&mut commands, tilemap);
 
     spawn_camera(&mut commands, player_start);
+    spawn_hud(&mut commands, &asset_server);
 }
