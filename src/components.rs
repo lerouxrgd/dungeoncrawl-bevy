@@ -35,9 +35,12 @@ pub struct MovingRandomly;
 
 pub struct WantsToMove {
     pub entity: Entity,
-    pub origin: Point,
     pub destination: Point,
-    pub render: Render,
+}
+
+pub struct WantsToAttack {
+    pub attacker: Entity,
+    pub victim: Entity,
 }
 
 #[derive(Default)]

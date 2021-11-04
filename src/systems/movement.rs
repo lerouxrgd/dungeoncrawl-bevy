@@ -6,18 +6,19 @@ pub fn movement(
     mut commands: Commands,
     mut tilemap_query: Query<&mut Tilemap>,
     player_query: Query<Entity, With<Player>>,
+    mover_query: Query<(&Point, &Render)>,
     mut camera_query: Query<&mut Transform, With<Camera>>,
 ) {
     let mut tilemap = tilemap_query.single_mut().unwrap();
 
     for WantsToMove {
         entity,
-        origin,
         destination,
-        render,
     } in ev_movements.drain()
     {
         if map_spec.can_enter_tile(destination) {
+            let (&origin, render) = mover_query.get(entity).unwrap();
+
             commands.entity(entity).insert(destination);
             move_sprite(&mut tilemap, origin, destination, &render);
 

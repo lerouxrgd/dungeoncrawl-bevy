@@ -4,7 +4,9 @@ pub fn player_input(
     mut key_evr: EventReader<KeyboardInput>,
     mut turn_state: ResMut<State<TurnState>>,
     mut ev_movements: EventWriter<WantsToMove>,
-    mut player_query: Query<(Entity, &Point, &Render), With<Player>>,
+    mut ev_attacks: EventWriter<WantsToAttack>,
+    mut player_query: Query<(Entity, &Point), With<Player>>,
+    enemies_query: Query<(Entity, &Point), With<Enemy>>,
 ) {
     for ev in key_evr.iter().take(1) {
         let delta = match (ev.state, ev.key_code) {
@@ -15,14 +17,28 @@ pub fn player_input(
             _ => return,
         };
 
-        let (player, &origin, &render) = player_query.single_mut().unwrap();
+        let (player, &origin) = player_query.single_mut().unwrap();
         let destination = origin + delta;
-        ev_movements.send(WantsToMove {
-            entity: player,
-            origin,
-            destination,
-            render,
-        });
+
+        let mut hit_something = false;
+        enemies_query
+            .iter()
+            .filter(|(_, &pos)| pos == destination)
+            .for_each(|(enemy, _)| {
+                hit_something = true;
+
+                ev_attacks.send(WantsToAttack {
+                    attacker: player,
+                    victim: enemy,
+                });
+            });
+
+        if !hit_something {
+            ev_movements.send(WantsToMove {
+                entity: player,
+                destination,
+            });
+        }
 
         turn_state.set(TurnState::PlayerTurn).unwrap();
     }

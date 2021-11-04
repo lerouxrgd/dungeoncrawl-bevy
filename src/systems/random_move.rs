@@ -2,12 +2,14 @@ use crate::prelude::*;
 
 pub fn random_move(
     mut ev_movements: EventWriter<WantsToMove>,
-    mut movers_query: Query<(Entity, &Point, &Render), With<MovingRandomly>>,
+    mut ev_attacks: EventWriter<WantsToAttack>,
+    movers_query: Query<(Entity, &Point), With<MovingRandomly>>,
+    player_query: Query<Entity, With<Player>>,
+    positions_query: Query<(Entity, &Point, &Health)>,
 ) {
-    movers_query.iter_mut().for_each(|(entity, pos, &render)| {
+    movers_query.iter().for_each(|(entity, pos)| {
         let mut rng = rand::thread_rng();
 
-        let origin = *pos;
         let destination = match rng.gen_range(0..4) {
             0 => Point::new(-1, 0),
             1 => Point::new(1, 0),
@@ -15,11 +17,27 @@ pub fn random_move(
             _ => Point::new(0, 1),
         } + *pos;
 
-        ev_movements.send(WantsToMove {
-            entity,
-            origin,
-            destination,
-            render,
-        });
+        let player = player_query.single().unwrap();
+        let mut attacked = false;
+        positions_query
+            .iter()
+            .filter(|(_, &pos, _)| pos == destination)
+            .for_each(|(victim, _, _)| {
+                if victim == player {
+                    ev_attacks.send(WantsToAttack {
+                        attacker: entity,
+                        victim: player,
+                    });
+                }
+
+                attacked = true;
+            });
+
+        if !attacked {
+            ev_movements.send(WantsToMove {
+                entity,
+                destination,
+            });
+        }
     });
 }
