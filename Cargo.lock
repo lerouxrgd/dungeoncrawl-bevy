@@ -1067,6 +1067,36 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0d8c1fef690941d3e7788d328517591fecc684c084084702d6ff1641e993699a"
 
 [[package]]
+name = "bracket-algorithm-traits"
+version = "0.8.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "af23ee41725dd41febe5f614851db8e5d44c07254dd91838b5ddf817060e2e73"
+dependencies = [
+ "bracket-geometry",
+ "smallvec",
+]
+
+[[package]]
+name = "bracket-geometry"
+version = "0.8.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4db22c32c68bd9330ab982f8ff7ffe7b10541d16ea7d7d51aac074499850402b"
+dependencies = [
+ "ultraviolet",
+]
+
+[[package]]
+name = "bracket-pathfinding"
+version = "0.8.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6b713222141585b5e5cc6f0be1a0a473e1e339aa1300af91929ce6b1b2ed529c"
+dependencies = [
+ "bracket-algorithm-traits",
+ "bracket-geometry",
+ "smallvec",
+]
+
+[[package]]
 name = "bumpalo"
 version = "3.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1526,6 +1556,7 @@ dependencies = [
  "bevy",
  "bevy_prototype_lyon",
  "bevy_tilemap",
+ "bracket-pathfinding",
  "lyon_tessellation",
  "rand 0.8.4",
 ]
@@ -3174,6 +3205,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "71d301d4193d031abdd79ff7e3dd721168a9572ef3fe51a1517aba235bd8f86e"
 
 [[package]]
+name = "safe_arch"
+version = "0.5.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c1ff3d6d9696af502cc3110dacce942840fb06ff4514cad92236ecc455f2ce05"
+dependencies = [
+ "bytemuck",
+]
+
+[[package]]
 name = "same-file"
 version = "1.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3631,6 +3671,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7ae2f58a822f08abdaf668897e96a5656fe72f5a9ce66422423e8849384872e6"
 
 [[package]]
+name = "ultraviolet"
+version = "0.8.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "16b9e3507eba17043af05c8a72fce3ec2c24b58945f45732e71dbc6646d904a7"
+dependencies = [
+ "wide",
+]
+
+[[package]]
 name = "unicode-segmentation"
 version = "1.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3826,6 +3875,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "72fa9ba80626278fd87351555c363378d08122d7601e58319be3d6fa85a87747"
 dependencies = [
  "bitflags",
+]
+
+[[package]]
+name = "wide"
+version = "0.6.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "46bbe7c604a27ca0b05c5503221e76da628225b568e6f1280b42dbad3b72d89b"
+dependencies = [
+ "bytemuck",
+ "safe_arch",
 ]
 
 [[package]]

@@ -5,37 +5,7 @@ use std::collections::HashSet;
 use std::convert::TryInto;
 use std::ops;
 
-#[derive(Eq, PartialEq, Copy, Clone, Debug, Hash)]
-pub struct Point {
-    pub x: i32,
-    pub y: i32,
-}
-
-impl Point {
-    pub fn new<T>(x: T, y: T) -> Point
-    where
-        T: TryInto<i32>,
-    {
-        Point {
-            x: x.try_into().ok().unwrap_or(0),
-            y: y.try_into().ok().unwrap_or(0),
-        }
-    }
-
-    pub fn zero() -> Point {
-        Point { x: 0, y: 0 }
-    }
-}
-
-/// Support adding a point to a point
-impl ops::Add<Point> for Point {
-    type Output = Point;
-    fn add(mut self, rhs: Point) -> Point {
-        self.x += rhs.x;
-        self.y += rhs.y;
-        self
-    }
-}
+use bracket_pathfinding::prelude::Point;
 
 #[derive(PartialEq, Eq, Copy, Clone, Debug)]
 pub struct Rect {

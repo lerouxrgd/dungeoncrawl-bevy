@@ -14,6 +14,7 @@ mod prelude {
     pub use bevy::text::Text2dSize;
     pub use bevy_prototype_lyon::prelude::*;
     pub use bevy_tilemap::prelude::*;
+    pub use bracket_pathfinding::prelude::*;
     pub use lyon_tessellation::path::Path;
     pub use rand::Rng;
 

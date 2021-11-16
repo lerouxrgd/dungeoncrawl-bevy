@@ -35,8 +35,8 @@ pub fn spawn_player(commands: &mut Commands, position: Point, tilemap: &mut Tile
             sprite_order,
         },
         health: Health {
-            current: 20,
-            max: 20,
+            current: 10,
+            max: 10,
         },
     });
 
@@ -77,7 +77,7 @@ pub fn spawn_monster(
             sprite_index,
             sprite_order,
         },
-        moving_randomly: MovingRandomly,
+        chasing_player: ChasingPlayer,
         health: Health {
             current: hp,
             max: hp,

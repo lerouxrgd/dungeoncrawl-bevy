@@ -1,5 +1,6 @@
 use crate::prelude::*;
 
+mod chasing;
 mod combat;
 mod end_turn;
 mod hud;
@@ -8,6 +9,7 @@ mod player_input;
 mod random_move;
 mod tooltips;
 
+use chasing::*;
 use combat::*;
 use end_turn::*;
 use hud::*;
@@ -72,7 +74,8 @@ pub fn add_systems(app: &mut AppBuilder) -> &mut AppBuilder {
         GameStage::MonsterTurn,
         SystemSet::on_update(TurnState::MonsterTurn)
             .with_system(random_move.system().label("random_move"))
-            .with_system(combat.system().label("combat").after("random_move"))
+            .with_system(chasing.system().label("chasing"))
+            .with_system(combat.system().label("combat").after("chasing"))
             .with_system(movement.system().label("movement").after("combat"))
             .with_system(end_turn.system().after("movement")),
     );

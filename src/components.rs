@@ -25,7 +25,7 @@ pub struct EnemyBundle {
     pub enemy: Enemy,
     pub position: Point,
     pub render: Render,
-    pub moving_randomly: MovingRandomly,
+    pub chasing_player: ChasingPlayer,
     pub health: Health,
     pub name: Name,
 }
@@ -42,6 +42,9 @@ pub struct WantsToAttack {
     pub attacker: Entity,
     pub victim: Entity,
 }
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct ChasingPlayer;
 
 #[derive(Default)]
 pub struct Health {
