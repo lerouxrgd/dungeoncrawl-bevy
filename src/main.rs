@@ -7,11 +7,13 @@ mod utils;
 
 mod prelude {
     pub use bevy::app::Events;
+    pub use bevy::ecs::component::Component;
     pub use bevy::input::keyboard::KeyboardInput;
     pub use bevy::input::ElementState;
     pub use bevy::prelude::*;
     pub use bevy::render::camera::{Camera, OrthographicProjection};
     pub use bevy::text::Text2dSize;
+    pub use bevy::window::WindowResized;
     pub use bevy_prototype_lyon::prelude::*;
     pub use bevy_tilemap::prelude::*;
     pub use bracket_pathfinding::prelude::*;
@@ -64,76 +66,38 @@ fn setup(
     let texture_atlas = TextureAtlas::from_grid(texture_handle, Vec2::new(32.0, 32.0), 16, 16);
 
     let texture_atlas_handle = texture_atlases.add(texture_atlas);
+    commands.insert_resource(texture_atlas_handle.clone());
 
-    // Setup map
+    // Setup font
 
-    let mut rng = rand::thread_rng();
+    let font_handle: Handle<Font> = asset_server.load("BigBlue_Terminal_437TT.TTF");
+    commands.insert_resource(font_handle.clone());
+
+    // Build map
+
+    let (mut tilemap, map_builder) = make_tilemap(texture_atlas_handle.clone());
     let MapBuilder {
-        map_spec,
-        rooms,
         player_start,
-    } = MapBuilder::new(&mut rng);
-
-    let mut tilemap = Tilemap::builder()
-        .dimensions(TILEMAP_WIDTH as u32, TILEMAP_HEIGHT as u32)
-        .chunk_dimensions(8, 8, 1)
-        .texture_dimensions(32, 32)
-        .texture_atlas(texture_atlas_handle)
-        .auto_chunk()
-        .add_layer(
-            TilemapLayer {
-                kind: LayerKind::Sparse,
-                ..Default::default()
-            },
-            1,
-        )
-        .add_layer(
-            TilemapLayer {
-                kind: LayerKind::Sparse,
-                ..Default::default()
-            },
-            2,
-        )
-        .finish()
-        .unwrap();
-
-    let tiles = map_spec
-        .tiles
-        .iter()
-        .enumerate()
-        .map(|(i, tile)| {
-            let sprite_index = match tile {
-                TileType::Floor => to_cp437('.'),
-                TileType::Wall => to_cp437('#'),
-            };
-
-            Tile {
-                point: (
-                    (i % TILEMAP_WIDTH as usize) as i32 - CAMERA_OFFSET_X,
-                    (i / TILEMAP_WIDTH as usize) as i32 - CAMERA_OFFSET_Y,
-                ),
-                sprite_index,
-                sprite_order: 0,
-                tint: Color::WHITE,
-            }
-        })
-        .collect::<Vec<_>>();
-    tilemap.insert_tiles(tiles).unwrap();
-
-    // Insert resources
+        amulet_start,
+        rooms,
+        map_spec,
+    } = map_builder;
 
     commands.insert_resource(map_spec);
 
     // Spawn entities
 
     spawn_player(&mut commands, player_start, &mut tilemap);
+    spawn_amulet_of_yala(&mut commands, amulet_start, &mut tilemap);
     rooms
         .iter()
         .skip(1)
         .map(|r| r.center())
-        .for_each(|pos| spawn_monster(&mut commands, &mut rng, pos, &mut tilemap));
+        .for_each(|pos| spawn_monster(&mut commands, pos, &mut tilemap));
+
+    spawn_hud(&mut commands, font_handle.clone());
     spawn_tilemap(&mut commands, tilemap);
 
     spawn_camera(&mut commands, player_start);
-    spawn_hud(&mut commands, &asset_server);
+    spawn_end_game_screens(&mut commands, font_handle.clone());
 }

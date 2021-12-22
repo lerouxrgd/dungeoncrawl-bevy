@@ -69,3 +69,72 @@ pub struct InfoText;
 
 #[derive(Default)]
 pub struct TooltipText;
+
+pub trait ScreenText: Component {
+    fn pos(&self) -> usize;
+    fn offset(&self) -> f32;
+}
+
+pub struct VictoryText {
+    pub pos: usize,
+    pub offset: f32,
+}
+
+impl VictoryText {
+    pub fn new(pos: usize) -> Self {
+        Self { pos, offset: 0. }
+    }
+
+    pub fn with_offset(pos: usize, offset: f32) -> Self {
+        Self { pos, offset }
+    }
+}
+
+impl ScreenText for VictoryText {
+    fn pos(&self) -> usize {
+        self.pos
+    }
+
+    fn offset(&self) -> f32 {
+        self.offset
+    }
+}
+
+pub struct GameoverText {
+    pub pos: usize,
+    pub offset: f32,
+}
+
+impl GameoverText {
+    pub fn new(pos: usize) -> Self {
+        Self { pos, offset: 0. }
+    }
+
+    pub fn with_offset(pos: usize, offset: f32) -> Self {
+        Self { pos, offset }
+    }
+}
+
+impl ScreenText for GameoverText {
+    fn pos(&self) -> usize {
+        self.pos
+    }
+
+    fn offset(&self) -> f32 {
+        self.offset
+    }
+}
+
+#[derive(Default)]
+pub struct Item;
+
+#[derive(Default)]
+pub struct AmuletOfYala;
+
+#[derive(Bundle)]
+pub struct AmuletBundle {
+    pub amulet: AmuletOfYala,
+    pub position: Point,
+    pub render: Render,
+    pub name: Name,
+}

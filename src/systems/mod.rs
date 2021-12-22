@@ -2,6 +2,7 @@ use crate::prelude::*;
 
 mod chasing;
 mod combat;
+mod end_game;
 mod end_turn;
 mod hud;
 mod movement;
@@ -11,6 +12,7 @@ mod tooltips;
 
 use chasing::*;
 use combat::*;
+use end_game::*;
 use end_turn::*;
 use hud::*;
 use movement::*;
@@ -59,7 +61,9 @@ pub fn add_systems(app: &mut AppBuilder) -> &mut AppBuilder {
     // Game systems
 
     app.add_system_set(
-        SystemSet::on_update(TurnState::AwaitingInput).with_system(player_input.system()),
+        SystemSet::on_update(TurnState::AwaitingInput)
+            .with_system(player_input.system())
+            .with_system(hud.system()),
     );
 
     app.add_system_set_to_stage(
@@ -67,7 +71,8 @@ pub fn add_systems(app: &mut AppBuilder) -> &mut AppBuilder {
         SystemSet::on_update(TurnState::PlayerTurn)
             .with_system(combat.system().label("combat"))
             .with_system(movement.system().label("movement").after("combat"))
-            .with_system(end_turn.system().after("movement")),
+            .with_system(end_turn.system().after("movement"))
+            .with_system(hud.system()),
     );
 
     app.add_system_set_to_stage(
@@ -77,17 +82,40 @@ pub fn add_systems(app: &mut AppBuilder) -> &mut AppBuilder {
             .with_system(chasing.system().label("chasing"))
             .with_system(combat.system().label("combat").after("chasing"))
             .with_system(movement.system().label("movement").after("combat"))
-            .with_system(end_turn.system().after("movement")),
+            .with_system(end_turn.system().after("movement"))
+            .with_system(hud.system()),
+    );
+
+    // Victory systems
+
+    app.add_system_set_to_stage(
+        GameStage::MonsterTurn,
+        SystemSet::on_enter(TurnState::Victory).with_system(despawn_game_state.system()),
+    );
+    app.add_system_set(
+        SystemSet::on_update(TurnState::Victory).with_system(text_screen::<VictoryText>.system()),
+    );
+    app.add_system_set(
+        SystemSet::on_exit(TurnState::Victory).with_system(respawn_game_state.system()),
+    );
+
+    // Gameover systems
+
+    app.add_system_set_to_stage(
+        GameStage::MonsterTurn,
+        SystemSet::on_enter(TurnState::GameOver).with_system(despawn_game_state.system()),
+    );
+    app.add_system_set(
+        SystemSet::on_update(TurnState::GameOver).with_system(text_screen::<GameoverText>.system()),
+    );
+    app.add_system_set(
+        SystemSet::on_exit(TurnState::GameOver).with_system(respawn_game_state.system()),
     );
 
     // Tooltips systems
 
     app.add_system_to_stage(TooltipStage::Create, tooltips.system());
     app.add_system_to_stage(TooltipStage::Display, tooltips_display.system());
-
-    // Independent systems
-
-    app.add_system(hud.system());
 
     app
 }

@@ -18,7 +18,7 @@ pub fn map_idx(x: i32, y: i32) -> usize {
 impl MapSpec {
     const NUM_TILES: usize = (TILEMAP_WIDTH * TILEMAP_HEIGHT) as usize;
 
-    pub fn new() -> Self {
+    fn new() -> Self {
         Self {
             tiles: vec![TileType::Floor; Self::NUM_TILES],
         }
@@ -98,22 +98,43 @@ pub struct MapBuilder {
     pub map_spec: MapSpec,
     pub rooms: Vec<Rect>,
     pub player_start: Point,
+    pub amulet_start: Point,
 }
 
 impl MapBuilder {
     const NUM_ROOMS: usize = 20;
 
-    pub fn new(rng: &mut impl Rng) -> Self {
+    fn new(rng: &mut impl Rng) -> Self {
         let mut mb = MapBuilder {
             map_spec: MapSpec::new(),
             rooms: Vec::new(),
             player_start: Point::zero(),
+            amulet_start: Point::zero(),
         };
 
         mb.fill(TileType::Wall);
         mb.build_random_rooms(rng);
         mb.build_corridors(rng);
         mb.player_start = mb.rooms[0].center();
+
+        let dijkstra_map = DijkstraMap::new(
+            TILEMAP_WIDTH,
+            TILEMAP_HEIGHT,
+            &vec![mb.map_spec.point2d_to_index(mb.player_start)],
+            &mb.map_spec,
+            1024.0,
+        );
+
+        const UNREACHABLE: f32 = f32::MAX;
+        let furthest_idx = dijkstra_map
+            .map
+            .iter()
+            .enumerate()
+            .filter(|(_, &dist)| dist < UNREACHABLE)
+            .max_by(|a, b| a.1.partial_cmp(b.1).unwrap())
+            .unwrap()
+            .0;
+        mb.amulet_start = mb.map_spec.index_to_point2d(furthest_idx);
 
         mb
     }
@@ -206,4 +227,58 @@ pub fn move_sprite(tilemap: &mut Tilemap, prev_pos: Point, new_pos: Point, rende
     };
 
     tilemap.insert_tile(tile).unwrap();
+}
+
+pub fn make_tilemap(texture_atlas: Handle<TextureAtlas>) -> (Tilemap, MapBuilder) {
+    let mut rng = rand::thread_rng();
+    let map_builder = MapBuilder::new(&mut rng);
+
+    let mut tilemap = Tilemap::builder()
+        .dimensions(TILEMAP_WIDTH as u32, TILEMAP_HEIGHT as u32)
+        .chunk_dimensions(8, 8, 1)
+        .texture_dimensions(32, 32)
+        .texture_atlas(texture_atlas)
+        .auto_chunk()
+        .add_layer(
+            TilemapLayer {
+                kind: LayerKind::Sparse,
+                ..Default::default()
+            },
+            1,
+        )
+        .add_layer(
+            TilemapLayer {
+                kind: LayerKind::Sparse,
+                ..Default::default()
+            },
+            2,
+        )
+        .finish()
+        .unwrap();
+
+    let tiles = map_builder
+        .map_spec
+        .tiles
+        .iter()
+        .enumerate()
+        .map(|(i, tile)| {
+            let sprite_index = match tile {
+                TileType::Floor => to_cp437('.'),
+                TileType::Wall => to_cp437('#'),
+            };
+
+            Tile {
+                point: (
+                    (i % TILEMAP_WIDTH as usize) as i32 - CAMERA_OFFSET_X,
+                    (i / TILEMAP_WIDTH as usize) as i32 - CAMERA_OFFSET_Y,
+                ),
+                sprite_index,
+                sprite_order: 0,
+                tint: Color::WHITE,
+            }
+        })
+        .collect::<Vec<_>>();
+    tilemap.insert_tiles(tiles).unwrap();
+
+    (tilemap, map_builder)
 }
