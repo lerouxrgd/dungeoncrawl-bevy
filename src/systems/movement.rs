@@ -6,7 +6,7 @@ pub fn movement(
     mut commands: Commands,
     mut tilemap_query: Query<&mut Tilemap>,
     player_query: Query<Entity, With<Player>>,
-    mover_query: Query<(&Point, &Render)>,
+    mut mover_query: Query<(&Point, &Render, &mut FieldOfView)>,
     mut camera_query: Query<&mut Transform, With<Camera>>,
 ) {
     let mut tilemap = tilemap_query.single_mut().unwrap();
@@ -17,10 +17,12 @@ pub fn movement(
     } in ev_movements.drain()
     {
         if map_spec.can_enter_tile(destination) {
-            let (&origin, render) = mover_query.get(entity).unwrap();
+            let (&origin, render, mut fov) = mover_query.get_mut(entity).unwrap();
 
             commands.entity(entity).insert(destination);
             move_sprite(&mut tilemap, origin, destination, &render);
+
+            *fov = fov.clone_dirty();
 
             let player = player_query.single().unwrap();
             if entity == player {

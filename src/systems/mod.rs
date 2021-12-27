@@ -4,7 +4,9 @@ mod chasing;
 mod combat;
 mod end_game;
 mod end_turn;
+mod fov;
 mod hud;
+mod map_render;
 mod movement;
 mod player_input;
 mod random_move;
@@ -14,7 +16,9 @@ use chasing::*;
 use combat::*;
 use end_game::*;
 use end_turn::*;
+use fov::*;
 use hud::*;
+use map_render::*;
 use movement::*;
 use player_input::*;
 use random_move::*;
@@ -60,9 +64,14 @@ pub fn add_systems(app: &mut AppBuilder) -> &mut AppBuilder {
 
     // Game systems
 
+    app.stage(CoreStage::Startup, |schedule: &mut Schedule| {
+        schedule.add_system_to_stage(StartupStage::PostStartup, fov.system())
+    });
+
     app.add_system_set(
         SystemSet::on_update(TurnState::AwaitingInput)
             .with_system(player_input.system())
+            .with_system(map_render.system())
             .with_system(hud.system()),
     );
 
@@ -71,8 +80,7 @@ pub fn add_systems(app: &mut AppBuilder) -> &mut AppBuilder {
         SystemSet::on_update(TurnState::PlayerTurn)
             .with_system(combat.system().label("combat"))
             .with_system(movement.system().label("movement").after("combat"))
-            .with_system(end_turn.system().after("movement"))
-            .with_system(hud.system()),
+            .with_system(end_turn.system().after("movement")),
     );
 
     app.add_system_set_to_stage(
@@ -82,8 +90,12 @@ pub fn add_systems(app: &mut AppBuilder) -> &mut AppBuilder {
             .with_system(chasing.system().label("chasing"))
             .with_system(combat.system().label("combat").after("chasing"))
             .with_system(movement.system().label("movement").after("combat"))
-            .with_system(end_turn.system().after("movement"))
-            .with_system(hud.system()),
+            .with_system(end_turn.system().after("movement")),
+    );
+
+    app.add_system_set_to_stage(
+        GameStage::MonsterTurn,
+        SystemSet::on_enter(TurnState::AwaitingInput).with_system(fov.system()),
     );
 
     // Victory systems

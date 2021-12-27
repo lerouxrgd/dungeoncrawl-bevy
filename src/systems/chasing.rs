@@ -4,7 +4,7 @@ pub fn chasing(
     map_spec: Res<MapSpec>,
     mut ev_movements: EventWriter<WantsToMove>,
     mut ev_attacks: EventWriter<WantsToAttack>,
-    movers_query: Query<(Entity, &Point), With<ChasingPlayer>>,
+    movers_query: Query<(Entity, &Point, &FieldOfView), With<ChasingPlayer>>,
     positions_query: Query<(Entity, &Point, &Health)>,
     player_query: Query<(Entity, &Point), With<Player>>,
 ) {
@@ -22,7 +22,11 @@ pub fn chasing(
         1024.0,
     );
 
-    movers_query.for_each(|(mover, &source_pos)| {
+    movers_query.for_each(|(mover, &source_pos, fov)| {
+        if !fov.visible_tiles.contains(&player_pos) {
+            return;
+        }
+
         let idx = map_idx(source_pos.x, source_pos.y);
         let destination = match DijkstraMap::find_lowest_exit(&dijkstra_map, idx, map_spec) {
             Some(destination) => destination,

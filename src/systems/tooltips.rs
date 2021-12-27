@@ -4,9 +4,10 @@ use crate::prelude::*;
 pub fn tooltips(
     windows: Res<Windows>,
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
+    font_handle: Res<Handle<Font>>,
     camera_query: Query<&Transform, With<Camera>>,
     positions_query: Query<(Entity, &Point, &Name, Option<&Health>)>,
+    player_query: Query<&FieldOfView, With<Player>>,
 ) {
     let window = windows.get_primary().unwrap();
 
@@ -20,8 +21,13 @@ pub fn tooltips(
             y: (world_pos.y / 32.).floor() as i32 + CAMERA_OFFSET_Y,
         };
 
+        let player_fov = match player_query.single() {
+            Ok(player_fov) => player_fov,
+            Err(_) => return,
+        };
+
         for (entity, &pos, name, health) in positions_query.iter() {
-            if pos == map_pos {
+            if pos == map_pos && player_fov.visible_tiles.contains(&pos) {
                 let display = if let Some(health) = health {
                     format!("{} : {} hp", &name.0, health.current)
                 } else {
@@ -34,7 +40,7 @@ pub fn tooltips(
                         text: Text::with_section(
                             display,
                             TextStyle {
-                                font: asset_server.load("BigBlue_Terminal_437TT.TTF"),
+                                font: font_handle.clone(),
                                 font_size: 10.0,
                                 color: Color::WHITE,
                             },

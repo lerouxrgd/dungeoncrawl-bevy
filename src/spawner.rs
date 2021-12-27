@@ -38,6 +38,7 @@ pub fn spawn_player(commands: &mut Commands, position: Point, tilemap: &mut Tile
             current: 10,
             max: 10,
         },
+        fov: FieldOfView::new(6),
     });
 
     tilemap
@@ -79,6 +80,7 @@ pub fn spawn_monster(commands: &mut Commands, position: Point, tilemap: &mut Til
             max: hp,
         },
         name: Name(name),
+        fov: FieldOfView::new(6),
     });
 
     tilemap
@@ -175,6 +177,10 @@ pub fn spawn_end_game_screens(commands: &mut Commands, font_handle: Handle<Font>
         vertical: VerticalAlign::Bottom,
         horizontal: HorizontalAlign::Center,
     };
+    let visible = Visible {
+        is_visible: false,
+        is_transparent: false,
+    };
 
     // Victory
 
@@ -190,10 +196,7 @@ pub fn spawn_end_game_screens(commands: &mut Commands, font_handle: Handle<Font>
                 },
                 alignment,
             ),
-            visible: Visible {
-                is_visible: false,
-                is_transparent: false,
-            },
+            visible: visible.clone(),
             ..Default::default()
         })
         .insert(VictoryText::with_offset(pos, 15.))
@@ -210,6 +213,7 @@ pub fn spawn_end_game_screens(commands: &mut Commands, font_handle: Handle<Font>
                         },
                         alignment,
                     ),
+                    visible: visible.clone(),
                     ..Default::default()
                 })
                 .insert(VictoryText::new(pos));
@@ -226,6 +230,7 @@ pub fn spawn_end_game_screens(commands: &mut Commands, font_handle: Handle<Font>
                         },
                         alignment,
                     ),
+                    visible: visible.clone(),
                     ..Default::default()
                 })
                 .insert(VictoryText::with_offset(pos, 15.));
@@ -242,6 +247,7 @@ pub fn spawn_end_game_screens(commands: &mut Commands, font_handle: Handle<Font>
                         },
                         alignment,
                     ),
+                    visible: visible.clone(),
                     ..Default::default()
                 })
                 .insert(VictoryText::new(pos));
@@ -261,10 +267,7 @@ pub fn spawn_end_game_screens(commands: &mut Commands, font_handle: Handle<Font>
                 },
                 alignment,
             ),
-            visible: Visible {
-                is_visible: false,
-                is_transparent: false,
-            },
+            visible: visible.clone(),
             ..Default::default()
         })
         .insert(GameoverText::with_offset(pos, 15.))
@@ -281,6 +284,7 @@ pub fn spawn_end_game_screens(commands: &mut Commands, font_handle: Handle<Font>
                         },
                         alignment,
                     ),
+                    visible: visible.clone(),
                     ..Default::default()
                 })
                 .insert(GameoverText::new(pos));
@@ -297,6 +301,7 @@ pub fn spawn_end_game_screens(commands: &mut Commands, font_handle: Handle<Font>
                         },
                         alignment,
                     ),
+                    visible: visible.clone(),
                     ..Default::default()
                 })
                 .insert(GameoverText::with_offset(pos, 15.));
@@ -313,6 +318,7 @@ pub fn spawn_end_game_screens(commands: &mut Commands, font_handle: Handle<Font>
                         },
                         alignment,
                     ),
+                    visible: visible.clone(),
                     ..Default::default()
                 })
                 .insert(GameoverText::new(pos));
@@ -329,6 +335,7 @@ pub fn spawn_end_game_screens(commands: &mut Commands, font_handle: Handle<Font>
                         },
                         alignment,
                     ),
+                    visible: visible.clone(),
                     ..Default::default()
                 })
                 .insert(GameoverText::new(pos));
