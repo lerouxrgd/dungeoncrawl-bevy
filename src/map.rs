@@ -9,6 +9,7 @@ pub enum TileType {
 
 pub struct MapSpec {
     pub tiles: Vec<TileType>,
+    pub revealed_tiles: Vec<bool>,
 }
 
 pub fn map_idx(x: i32, y: i32) -> usize {
@@ -21,6 +22,7 @@ impl MapSpec {
     fn new() -> Self {
         Self {
             tiles: vec![TileType::Floor; Self::NUM_TILES],
+            revealed_tiles: vec![false; Self::NUM_TILES],
         }
     }
 

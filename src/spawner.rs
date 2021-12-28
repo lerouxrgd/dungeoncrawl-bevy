@@ -97,18 +97,16 @@ pub fn spawn_amulet_of_yala(commands: &mut Commands, position: Point, tilemap: &
     let sprite_index = to_cp437('|');
     let sprite_order = 2;
 
-    commands
-        .spawn()
-        .insert_bundle(AmuletBundle {
-            amulet: AmuletOfYala,
-            position,
-            render: Render {
-                sprite_index,
-                sprite_order,
-            },
-            name: Name("Amulet of Yala".to_string()),
-        })
-        .insert(Item);
+    commands.spawn().insert_bundle(AmuletBundle {
+        amulet: AmuletOfYala,
+        position,
+        render: Render {
+            sprite_index,
+            sprite_order,
+        },
+        name: Name("Amulet of Yala".to_string()),
+        item: Item,
+    });
 
     tilemap
         .insert_tile(Tile {

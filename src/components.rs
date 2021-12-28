@@ -141,6 +141,7 @@ pub struct AmuletBundle {
     pub position: Point,
     pub render: Render,
     pub name: Name,
+    pub item: Item,
 }
 
 #[derive(Clone, Debug, PartialEq)]

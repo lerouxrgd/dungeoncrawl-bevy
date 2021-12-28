@@ -1,7 +1,7 @@
 use crate::prelude::*;
 
 pub fn movement(
-    map_spec: Res<MapSpec>,
+    mut map_spec: ResMut<MapSpec>,
     mut ev_movements: ResMut<Events<WantsToMove>>,
     mut commands: Commands,
     mut tilemap_query: Query<&mut Tilemap>,
@@ -22,15 +22,19 @@ pub fn movement(
             commands.entity(entity).insert(destination);
             move_sprite(&mut tilemap, origin, destination, &render);
 
-            *fov = fov.clone_dirty();
-
             let player = player_query.single().unwrap();
             if entity == player {
                 let mut camera_transform = camera_query.single_mut().unwrap();
                 let camera_translation = &mut camera_transform.translation;
                 camera_translation.x = (destination.x - CAMERA_OFFSET_X) as f32 * 32.;
                 camera_translation.y = (destination.y - CAMERA_OFFSET_Y) as f32 * 32.;
+
+                fov.visible_tiles.iter().for_each(|pos| {
+                    map_spec.revealed_tiles[map_idx(pos.x, pos.y)] = true;
+                });
             }
+
+            *fov = fov.clone_dirty();
         }
     }
 }
