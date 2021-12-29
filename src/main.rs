@@ -1,5 +1,5 @@
 mod components;
-mod map;
+mod map_builder;
 mod spawner;
 mod systems;
 mod turn_state;
@@ -26,7 +26,7 @@ mod prelude {
     pub const CAMERA_OFFSET_Y: i32 = TILEMAP_HEIGHT / 2;
 
     pub use crate::components::*;
-    pub use crate::map::*;
+    pub use crate::map_builder::*;
     pub use crate::spawner::*;
     pub use crate::systems::*;
     pub use crate::turn_state::*;
@@ -79,8 +79,9 @@ fn setup(
     let MapBuilder {
         player_start,
         amulet_start,
-        rooms,
+        monster_spawns,
         map_spec,
+        ..
     } = map_builder;
 
     commands.insert_resource(map_spec);
@@ -89,10 +90,8 @@ fn setup(
 
     spawn_player(&mut commands, player_start, &mut tilemap);
     spawn_amulet_of_yala(&mut commands, amulet_start, &mut tilemap);
-    rooms
-        .iter()
-        .skip(1)
-        .map(|r| r.center())
+    monster_spawns
+        .into_iter()
         .for_each(|pos| spawn_monster(&mut commands, pos, &mut tilemap));
 
     spawn_hud(&mut commands, font_handle.clone());

@@ -41,8 +41,9 @@ pub fn respawn_game_state(
     let MapBuilder {
         player_start,
         amulet_start,
-        rooms,
+        monster_spawns,
         map_spec,
+        ..
     } = map_builder;
 
     commands.insert_resource(map_spec);
@@ -51,10 +52,8 @@ pub fn respawn_game_state(
 
     spawn_player(&mut commands, player_start, &mut tilemap);
     spawn_amulet_of_yala(&mut commands, amulet_start, &mut tilemap);
-    rooms
-        .iter()
-        .skip(1)
-        .map(|r| r.center())
+    monster_spawns
+        .into_iter()
         .for_each(|pos| spawn_monster(&mut commands, pos, &mut tilemap));
 
     spawn_hud(&mut commands, font_handle.clone());
