@@ -1,3 +1,4 @@
+mod cellular;
 mod empty;
 mod rooms;
 
@@ -18,9 +19,10 @@ pub struct MapBuilder {
 
 impl MapBuilder {
     const NUM_ROOMS: usize = 20;
+    const NUM_MONSTERS: usize = 50;
 
     fn new(rng: &mut impl Rng) -> Self {
-        let mut architect = rooms::RoomsArchitect;
+        let mut architect = cellular::CellularAutomataArchitect;
         architect.new(rng)
     }
 
@@ -113,6 +115,30 @@ impl MapBuilder {
                 self.apply_horizontal_tunnel(prev.x, new.x, new.y);
             }
         }
+    }
+
+    fn spawn_monsters(&self, start: &Point, rng: &mut impl Rng) -> Vec<Point> {
+        let mut spawnable_tiles: Vec<Point> = self
+            .map_spec
+            .tiles
+            .iter()
+            .enumerate()
+            .filter(|&(idx, &t)| {
+                t == TileType::Floor
+                    && DistanceAlg::Pythagoras
+                        .distance2d(*start, self.map_spec.index_to_point2d(idx))
+                        > 10.0
+            })
+            .map(|(idx, _)| self.map_spec.index_to_point2d(idx))
+            .collect();
+
+        let mut spawns = Vec::new();
+        for _ in 0..MapBuilder::NUM_MONSTERS {
+            let target_index = rng.gen_range(0..spawnable_tiles.len());
+            spawns.push(spawnable_tiles.remove(target_index));
+        }
+
+        spawns
     }
 }
 
