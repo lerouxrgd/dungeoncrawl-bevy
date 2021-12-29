@@ -1,4 +1,5 @@
 mod cellular;
+mod drunkard;
 mod empty;
 mod rooms;
 
@@ -22,7 +23,7 @@ impl MapBuilder {
     const NUM_MONSTERS: usize = 50;
 
     fn new(rng: &mut impl Rng) -> Self {
-        let mut architect = cellular::CellularAutomataArchitect;
+        let mut architect = drunkard::DrunkardsWalkArchitect;
         architect.new(rng)
     }
 
