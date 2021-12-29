@@ -8,7 +8,7 @@ const DESIRED_FLOOR: usize = NUM_TILES / 3;
 pub struct DrunkardsWalkArchitect;
 
 impl MapArchitect for DrunkardsWalkArchitect {
-    fn new(&mut self, rng: &mut impl Rng) -> MapBuilder {
+    fn new(&mut self, rng: &mut ThreadRng) -> MapBuilder {
         let mut mb = MapBuilder {
             map_spec: MapSpec::new(),
             rooms: Vec::new(),

@@ -18,7 +18,7 @@ mod prelude {
     pub use bevy_tilemap::prelude::*;
     pub use bracket_pathfinding::prelude::*;
     pub use lyon_tessellation::path::Path;
-    pub use rand::Rng;
+    pub use rand::{rngs::ThreadRng, Rng};
 
     pub const TILEMAP_WIDTH: i32 = 80;
     pub const TILEMAP_HEIGHT: i32 = 50;

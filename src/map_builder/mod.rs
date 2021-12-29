@@ -7,7 +7,7 @@ use crate::prelude::*;
 use crate::utils::Rect;
 
 trait MapArchitect {
-    fn new(&mut self, rng: &mut impl Rng) -> MapBuilder;
+    fn new(&mut self, rng: &mut ThreadRng) -> MapBuilder;
 }
 
 pub struct MapBuilder {
@@ -22,9 +22,14 @@ impl MapBuilder {
     const NUM_ROOMS: usize = 20;
     const NUM_MONSTERS: usize = 50;
 
-    fn new(rng: &mut impl Rng) -> Self {
-        let mut architect = drunkard::DrunkardsWalkArchitect;
-        architect.new(rng)
+    fn new(rng: &mut ThreadRng) -> Self {
+        let mut architect: Box<dyn MapArchitect> = match rng.gen_range(0..3) {
+            0 => Box::new(drunkard::DrunkardsWalkArchitect),
+            1 => Box::new(rooms::RoomsArchitect),
+            _ => Box::new(cellular::CellularAutomataArchitect),
+        };
+        let mb = architect.new(rng);
+        mb
     }
 
     fn fill(&mut self, tile: TileType) {
