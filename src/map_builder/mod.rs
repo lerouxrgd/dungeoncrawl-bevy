@@ -1,6 +1,7 @@
 mod cellular;
 mod drunkard;
 mod empty;
+mod prefab;
 mod rooms;
 
 use crate::prelude::*;
@@ -28,7 +29,8 @@ impl MapBuilder {
             1 => Box::new(rooms::RoomsArchitect),
             _ => Box::new(cellular::CellularAutomataArchitect),
         };
-        let mb = architect.new(rng);
+        let mut mb = architect.new(rng);
+        prefab::apply_prefab(&mut mb, rng);
         mb
     }
 
