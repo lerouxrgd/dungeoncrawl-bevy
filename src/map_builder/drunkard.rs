@@ -1,4 +1,3 @@
-use super::MapArchitect;
 use crate::prelude::*;
 
 const STAGGER_DISTANCE: usize = 400;
@@ -7,7 +6,7 @@ const DESIRED_FLOOR: usize = NUM_TILES / 3;
 
 pub struct DrunkardsWalkArchitect;
 
-impl MapArchitect for DrunkardsWalkArchitect {
+impl super::MapArchitect for DrunkardsWalkArchitect {
     fn new(&mut self, rng: &mut ThreadRng) -> MapBuilder {
         let mut mb = MapBuilder {
             map_spec: MapSpec::new(),
@@ -15,6 +14,7 @@ impl MapArchitect for DrunkardsWalkArchitect {
             monster_spawns: Vec::new(),
             player_start: Point::zero(),
             amulet_start: Point::zero(),
+            theme: super::themes::DungeonTheme::new(),
         };
 
         mb.fill(TileType::Wall);

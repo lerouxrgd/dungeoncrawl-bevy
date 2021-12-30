@@ -3,9 +3,14 @@ mod drunkard;
 mod empty;
 mod prefab;
 mod rooms;
+mod themes;
 
 use crate::prelude::*;
 use crate::utils::Rect;
+
+pub trait MapTheme: Sync + Send {
+    fn tile_to_render(&self, tile_type: TileType) -> usize;
+}
 
 trait MapArchitect {
     fn new(&mut self, rng: &mut ThreadRng) -> MapBuilder;
@@ -17,6 +22,7 @@ pub struct MapBuilder {
     pub monster_spawns: Vec<Point>,
     pub player_start: Point,
     pub amulet_start: Point,
+    pub theme: Box<dyn MapTheme>,
 }
 
 impl MapBuilder {
@@ -30,7 +36,14 @@ impl MapBuilder {
             _ => Box::new(cellular::CellularAutomataArchitect),
         };
         let mut mb = architect.new(rng);
+
         prefab::apply_prefab(&mut mb, rng);
+
+        mb.theme = match rng.gen_range(0..2) {
+            0 => themes::DungeonTheme::new(),
+            _ => themes::ForestTheme::new(),
+        };
+
         mb
     }
 
@@ -301,12 +314,8 @@ pub fn make_tilemap(texture_atlas: Handle<TextureAtlas>) -> (Tilemap, MapBuilder
         .tiles
         .iter()
         .enumerate()
-        .map(|(i, tile)| {
-            let sprite_index = match tile {
-                TileType::Floor => to_cp437('.'),
-                TileType::Wall => to_cp437('#'),
-            };
-
+        .map(|(i, &tile)| {
+            let sprite_index = map_builder.theme.tile_to_render(tile);
             Tile {
                 point: (
                     (i % TILEMAP_WIDTH as usize) as i32 - CAMERA_OFFSET_X,

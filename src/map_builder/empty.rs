@@ -1,9 +1,8 @@
-use super::MapArchitect;
 use crate::prelude::*;
 
 pub struct EmptyArchitect;
 
-impl MapArchitect for EmptyArchitect {
+impl super::MapArchitect for EmptyArchitect {
     fn new(&mut self, rng: &mut ThreadRng) -> MapBuilder {
         let mut mb = MapBuilder {
             map_spec: MapSpec::new(),
@@ -11,6 +10,7 @@ impl MapArchitect for EmptyArchitect {
             monster_spawns: Vec::new(),
             player_start: Point::zero(),
             amulet_start: Point::zero(),
+            theme: super::themes::DungeonTheme::new(),
         };
 
         mb.fill(TileType::Floor);
