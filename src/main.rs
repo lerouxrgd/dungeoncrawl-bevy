@@ -25,6 +25,7 @@ mod prelude {
     pub const CAMERA_OFFSET_X: i32 = TILEMAP_WIDTH / 2;
     pub const CAMERA_OFFSET_Y: i32 = TILEMAP_HEIGHT / 2;
 
+    pub use crate::components::Name;
     pub use crate::components::*;
     pub use crate::map_builder::*;
     pub use crate::spawner::*;
@@ -92,7 +93,7 @@ fn setup(
     spawn_amulet_of_yala(&mut commands, amulet_start, &mut tilemap);
     monster_spawns
         .into_iter()
-        .for_each(|pos| spawn_monster(&mut commands, pos, &mut tilemap));
+        .for_each(|pos| spawn_entity(&mut commands, pos, &mut tilemap));
 
     spawn_hud(&mut commands, font_handle.clone());
     spawn_tilemap(&mut commands, tilemap);

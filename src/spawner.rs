@@ -25,7 +25,7 @@ pub fn spawn_camera(commands: &mut Commands, player_start: Point) {
 
 pub fn spawn_player(commands: &mut Commands, position: Point, tilemap: &mut Tilemap) {
     let sprite_index = to_cp437('@');
-    let sprite_order = 2;
+    let sprite_order = 3;
 
     commands.spawn().insert_bundle(PlayerBundle {
         player: Player,
@@ -49,6 +49,16 @@ pub fn spawn_player(commands: &mut Commands, position: Point, tilemap: &mut Tile
             tint: Color::WHITE,
         })
         .unwrap();
+}
+
+pub fn spawn_entity(commands: &mut Commands, position: Point, tilemap: &mut Tilemap) {
+    let mut rng = rand::thread_rng();
+    let roll = rng.gen_range(1..=6);
+    match roll {
+        1 => spawn_healing_potion(commands, position, tilemap),
+        2 => spawn_magic_mapper(commands, position, tilemap),
+        _ => spawn_monster(commands, position, tilemap),
+    }
 }
 
 pub fn spawn_monster(commands: &mut Commands, position: Point, tilemap: &mut Tilemap) {
@@ -93,20 +103,76 @@ pub fn spawn_monster(commands: &mut Commands, position: Point, tilemap: &mut Til
         .unwrap();
 }
 
+pub fn spawn_healing_potion(commands: &mut Commands, position: Point, tilemap: &mut Tilemap) {
+    let sprite_index = to_cp437('!');
+    let sprite_order = 2;
+
+    commands
+        .spawn()
+        .insert_bundle(ItemBundle {
+            item: Item,
+            position,
+            render: Render {
+                sprite_index,
+                sprite_order,
+            },
+            name: Name("Healing Potion".to_string()),
+        })
+        .insert(ProvidesHealing { amount: 6 });
+
+    tilemap
+        .insert_tile(Tile {
+            point: (position.x - CAMERA_OFFSET_X, position.y - CAMERA_OFFSET_Y),
+            sprite_index,
+            sprite_order,
+            tint: Color::WHITE,
+        })
+        .unwrap();
+}
+
+pub fn spawn_magic_mapper(commands: &mut Commands, position: Point, tilemap: &mut Tilemap) {
+    let sprite_index = to_cp437('{');
+    let sprite_order = 2;
+
+    commands
+        .spawn()
+        .insert_bundle(ItemBundle {
+            item: Item,
+            position,
+            render: Render {
+                sprite_index,
+                sprite_order,
+            },
+            name: Name("Dungeon Map".to_string()),
+        })
+        .insert(ProvidesDungeonMap);
+
+    tilemap
+        .insert_tile(Tile {
+            point: (position.x - CAMERA_OFFSET_X, position.y - CAMERA_OFFSET_Y),
+            sprite_index,
+            sprite_order,
+            tint: Color::WHITE,
+        })
+        .unwrap();
+}
+
 pub fn spawn_amulet_of_yala(commands: &mut Commands, position: Point, tilemap: &mut Tilemap) {
     let sprite_index = to_cp437('|');
     let sprite_order = 2;
 
-    commands.spawn().insert_bundle(AmuletBundle {
-        amulet: AmuletOfYala,
-        position,
-        render: Render {
-            sprite_index,
-            sprite_order,
-        },
-        name: Name("Amulet of Yala".to_string()),
-        item: Item,
-    });
+    commands
+        .spawn()
+        .insert_bundle(ItemBundle {
+            position,
+            render: Render {
+                sprite_index,
+                sprite_order,
+            },
+            name: Name("Amulet of Yala".to_string()),
+            item: Item,
+        })
+        .insert(AmuletOfYala);
 
     tilemap
         .insert_tile(Tile {
@@ -168,6 +234,29 @@ pub fn spawn_hud(commands: &mut Commands, font_handle: Handle<Font>) {
                 .insert(Hud)
                 .insert(InfoText);
         });
+
+    commands
+        .spawn_bundle(Text2dBundle {
+            text: Text::with_section(
+                "Items carried",
+                TextStyle {
+                    font: font_handle.clone(),
+                    font_size: 10.0,
+                    color: Color::YELLOW,
+                },
+                TextAlignment {
+                    vertical: VerticalAlign::Bottom,
+                    horizontal: HorizontalAlign::Right,
+                },
+            ),
+            visible: Visible {
+                is_visible: false,
+                is_transparent: true,
+            },
+            ..Default::default()
+        })
+        .insert(Hud)
+        .insert(InventoryText);
 }
 
 pub fn spawn_end_game_screens(commands: &mut Commands, font_handle: Handle<Font>) {

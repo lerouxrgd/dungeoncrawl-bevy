@@ -72,7 +72,8 @@ pub fn add_systems(app: &mut AppBuilder) -> &mut AppBuilder {
         SystemSet::on_update(TurnState::AwaitingInput)
             .with_system(player_input.system())
             .with_system(map_render.system())
-            .with_system(hud.system()),
+            .with_system(main_hud.system())
+            .with_system(inventory_hud.system()),
     );
 
     app.add_system_set_to_stage(

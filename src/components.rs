@@ -2,12 +2,6 @@ use std::collections::HashSet;
 
 use crate::prelude::*;
 
-#[derive(Default, Clone, Copy)]
-pub struct Render {
-    pub sprite_index: usize,
-    pub sprite_order: usize,
-}
-
 #[derive(Default)]
 pub struct Player;
 
@@ -35,6 +29,39 @@ pub struct EnemyBundle {
 }
 
 #[derive(Default)]
+pub struct Health {
+    pub current: i32,
+    pub max: i32,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct FieldOfView {
+    pub visible_tiles: HashSet<Point>,
+    pub radius: i32,
+    pub is_dirty: bool,
+}
+
+impl FieldOfView {
+    pub fn new(radius: i32) -> Self {
+        Self {
+            visible_tiles: HashSet::new(),
+            radius,
+            is_dirty: true,
+        }
+    }
+
+    pub fn clone_dirty(&self) -> Self {
+        Self {
+            visible_tiles: HashSet::new(),
+            radius: self.radius,
+            is_dirty: true,
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+
+#[derive(Default)]
 pub struct MovingRandomly;
 
 pub struct WantsToMove {
@@ -50,14 +77,7 @@ pub struct WantsToAttack {
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ChasingPlayer;
 
-#[derive(Default)]
-pub struct Health {
-    pub current: i32,
-    pub max: i32,
-}
-
-#[derive(Default)]
-pub struct Name(pub String);
+////////////////////////////////////////////////////////////////////////////////////////
 
 #[derive(Default)]
 pub struct Hud;
@@ -130,41 +150,42 @@ impl ScreenText for GameoverText {
 }
 
 #[derive(Default)]
+pub struct InventoryText;
+
+////////////////////////////////////////////////////////////////////////////////////////
+
+#[derive(Default)]
 pub struct Item;
+
+#[derive(Bundle)]
+pub struct ItemBundle {
+    pub item: Item,
+    pub position: Point,
+    pub render: Render,
+    pub name: Name,
+}
 
 #[derive(Default)]
 pub struct AmuletOfYala;
 
-#[derive(Bundle)]
-pub struct AmuletBundle {
-    pub amulet: AmuletOfYala,
-    pub position: Point,
-    pub render: Render,
-    pub name: Name,
-    pub item: Item,
+#[derive(Default)]
+pub struct ProvidesHealing {
+    pub amount: i32,
 }
 
-#[derive(Clone, Debug, PartialEq)]
-pub struct FieldOfView {
-    pub visible_tiles: HashSet<Point>,
-    pub radius: i32,
-    pub is_dirty: bool,
-}
+#[derive(Default)]
+pub struct ProvidesDungeonMap;
 
-impl FieldOfView {
-    pub fn new(radius: i32) -> Self {
-        Self {
-            visible_tiles: HashSet::new(),
-            radius,
-            is_dirty: true,
-        }
-    }
+#[derive(Clone, PartialEq)]
+pub struct Carried(pub Entity);
 
-    pub fn clone_dirty(&self) -> Self {
-        Self {
-            visible_tiles: HashSet::new(),
-            radius: self.radius,
-            is_dirty: true,
-        }
-    }
+////////////////////////////////////////////////////////////////////////////////////////
+
+#[derive(Default)]
+pub struct Name(pub String);
+
+#[derive(Default, Clone, Copy)]
+pub struct Render {
+    pub sprite_index: usize,
+    pub sprite_order: usize,
 }

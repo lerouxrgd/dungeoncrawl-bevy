@@ -293,6 +293,7 @@ pub fn make_tilemap(texture_atlas: Handle<TextureAtlas>) -> (Tilemap, MapBuilder
         .texture_atlas(texture_atlas)
         .auto_chunk()
         .add_layer(
+            // monsters
             TilemapLayer {
                 kind: LayerKind::Sparse,
                 ..Default::default()
@@ -300,11 +301,20 @@ pub fn make_tilemap(texture_atlas: Handle<TextureAtlas>) -> (Tilemap, MapBuilder
             1,
         )
         .add_layer(
+            // items
             TilemapLayer {
                 kind: LayerKind::Sparse,
                 ..Default::default()
             },
             2,
+        )
+        .add_layer(
+            // player
+            TilemapLayer {
+                kind: LayerKind::Sparse,
+                ..Default::default()
+            },
+            3,
         )
         .finish()
         .unwrap();

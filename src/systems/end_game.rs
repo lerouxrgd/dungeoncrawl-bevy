@@ -8,7 +8,7 @@ pub fn despawn_game_state(
         Entity,
         Or<(
             With<Player>,
-            With<AmuletOfYala>,
+            With<Item>,
             With<Enemy>,
             With<Hud>,
             With<Tilemap>,
@@ -54,7 +54,7 @@ pub fn respawn_game_state(
     spawn_amulet_of_yala(&mut commands, amulet_start, &mut tilemap);
     monster_spawns
         .into_iter()
-        .for_each(|pos| spawn_monster(&mut commands, pos, &mut tilemap));
+        .for_each(|pos| spawn_entity(&mut commands, pos, &mut tilemap));
 
     spawn_hud(&mut commands, font_handle.clone());
     spawn_tilemap(&mut commands, tilemap);
