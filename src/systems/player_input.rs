@@ -7,7 +7,7 @@ pub fn player_input(
     mut ev_attacks: EventWriter<WantsToAttack>,
     mut ev_item: EventWriter<ActivateItem>,
     mut commands: Commands,
-    mut player_query: Query<(Entity, &Point, &mut Health), With<Player>>,
+    player_query: Query<(Entity, &Point), With<Player>>,
     mut tilemap_query: Query<&mut Tilemap>,
     items_query: Query<(Entity, &Point, &Render), With<Item>>,
     carried_items_query: Query<(Entity, &Carried), With<Item>>,
@@ -15,7 +15,7 @@ pub fn player_input(
     font_handle: Res<Handle<Font>>,
 ) {
     for ev in key_evr.iter().take(1) {
-        let (player, &player_pos, mut health) = player_query.single_mut().unwrap();
+        let (player, &player_pos) = player_query.single().unwrap();
 
         let delta = match (ev.state, ev.key_code) {
             // movements
@@ -26,8 +26,6 @@ pub fn player_input(
 
             // pick up item
             (ElementState::Pressed, Some(KeyCode::G)) => {
-                // let (player, &player_pos, _) = player_query.single_mut().unwrap();
-
                 items_query
                     .iter()
                     .filter(|(_, &item_pos, _)| item_pos == player_pos)
@@ -100,12 +98,8 @@ pub fn player_input(
             _ => return,
         };
 
-        // No movement => heal
-        if delta == Point::zero() {
-            health.current = i32::min(health.max, health.current + 1);
-        } else
         // Move or attack
-        {
+        if delta != Point::zero() {
             let destination = player_pos + delta;
 
             let mut hit_something = false;
