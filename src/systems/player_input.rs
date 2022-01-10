@@ -5,14 +5,18 @@ pub fn player_input(
     mut turn_state: ResMut<State<TurnState>>,
     mut ev_movements: EventWriter<WantsToMove>,
     mut ev_attacks: EventWriter<WantsToAttack>,
+    mut ev_item: EventWriter<ActivateItem>,
     mut commands: Commands,
     mut player_query: Query<(Entity, &Point, &mut Health), With<Player>>,
     mut tilemap_query: Query<&mut Tilemap>,
     items_query: Query<(Entity, &Point, &Render), With<Item>>,
+    carried_items_query: Query<(Entity, &Carried), With<Item>>,
     enemies_query: Query<(Entity, &Point), With<Enemy>>,
     font_handle: Res<Handle<Font>>,
 ) {
     for ev in key_evr.iter().take(1) {
+        let (player, &player_pos, mut health) = player_query.single_mut().unwrap();
+
         let delta = match (ev.state, ev.key_code) {
             // movements
             (ElementState::Pressed, Some(KeyCode::Up)) => Point::new(0, 1),
@@ -22,7 +26,7 @@ pub fn player_input(
 
             // pick up item
             (ElementState::Pressed, Some(KeyCode::G)) => {
-                let (player, &player_pos, _) = player_query.single_mut().unwrap();
+                // let (player, &player_pos, _) = player_query.single_mut().unwrap();
 
                 items_query
                     .iter()
@@ -61,13 +65,40 @@ pub fn player_input(
                 Point::zero()
             }
 
+            // use item
+            (ElementState::Pressed, Some(KeyCode::Key1)) => {
+                use_item(0, player, &carried_items_query, &mut ev_item)
+            }
+            (ElementState::Pressed, Some(KeyCode::Key2)) => {
+                use_item(1, player, &carried_items_query, &mut ev_item)
+            }
+            (ElementState::Pressed, Some(KeyCode::Key3)) => {
+                use_item(2, player, &carried_items_query, &mut ev_item)
+            }
+            (ElementState::Pressed, Some(KeyCode::Key4)) => {
+                use_item(3, player, &carried_items_query, &mut ev_item)
+            }
+            (ElementState::Pressed, Some(KeyCode::Key5)) => {
+                use_item(4, player, &carried_items_query, &mut ev_item)
+            }
+            (ElementState::Pressed, Some(KeyCode::Key6)) => {
+                use_item(5, player, &carried_items_query, &mut ev_item)
+            }
+            (ElementState::Pressed, Some(KeyCode::Key7)) => {
+                use_item(6, player, &carried_items_query, &mut ev_item)
+            }
+            (ElementState::Pressed, Some(KeyCode::Key8)) => {
+                use_item(7, player, &carried_items_query, &mut ev_item)
+            }
+            (ElementState::Pressed, Some(KeyCode::Key9)) => {
+                use_item(8, player, &carried_items_query, &mut ev_item)
+            }
+
             // ignore other keys
             (ElementState::Pressed, Some(_)) => Point::zero(),
             // no key were pressed
             _ => return,
         };
-
-        let (player, &origin, mut health) = player_query.single_mut().unwrap();
 
         // No movement => heal
         if delta == Point::zero() {
@@ -75,7 +106,7 @@ pub fn player_input(
         } else
         // Move or attack
         {
-            let destination = origin + delta;
+            let destination = player_pos + delta;
 
             let mut hit_something = false;
             enemies_query
@@ -100,4 +131,27 @@ pub fn player_input(
 
         turn_state.set(TurnState::PlayerTurn).unwrap();
     }
+}
+
+fn use_item(
+    n: usize,
+    player: Entity,
+    carried_items_query: &Query<(Entity, &Carried), With<Item>>,
+    ev_item: &mut EventWriter<ActivateItem>,
+) -> Point {
+    let item = carried_items_query
+        .iter()
+        .filter(|(_, carried)| carried.0 == player)
+        .enumerate()
+        .filter(|&(item_idx, (_, _))| item_idx == n)
+        .find_map(|(_, (item, _))| Some(item));
+
+    if let Some(item) = item {
+        ev_item.send(ActivateItem {
+            used_by: player,
+            item,
+        });
+    }
+
+    Point::zero()
 }

@@ -49,7 +49,8 @@ fn main() {
     .add_startup_system(setup.system())
     .add_state(TurnState::AwaitingInput)
     .init_resource::<Events<WantsToMove>>()
-    .init_resource::<Events<WantsToAttack>>();
+    .init_resource::<Events<WantsToAttack>>()
+    .init_resource::<Events<ActivateItem>>();
 
     add_systems(&mut app);
 

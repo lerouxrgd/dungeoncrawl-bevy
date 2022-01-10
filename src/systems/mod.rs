@@ -11,6 +11,7 @@ mod movement;
 mod player_input;
 mod random_move;
 mod tooltips;
+mod use_items;
 
 use chasing::*;
 use combat::*;
@@ -23,6 +24,7 @@ use movement::*;
 use player_input::*;
 use random_move::*;
 use tooltips::*;
+use use_items::*;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, StageLabel)]
 enum GameStage {
@@ -79,6 +81,7 @@ pub fn add_systems(app: &mut AppBuilder) -> &mut AppBuilder {
     app.add_system_set_to_stage(
         GameStage::PlayerTurn,
         SystemSet::on_update(TurnState::PlayerTurn)
+            .with_system(use_items.system())
             .with_system(combat.system().label("combat"))
             .with_system(movement.system().label("movement").after("combat"))
             .with_system(end_turn.system().after("movement")),
