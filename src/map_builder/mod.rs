@@ -167,6 +167,7 @@ impl MapBuilder {
 pub enum TileType {
     Wall,
     Floor,
+    Exit,
 }
 
 pub struct MapSpec {
@@ -197,7 +198,9 @@ impl MapSpec {
     }
 
     pub fn can_enter_tile(&self, point: Point) -> bool {
-        self.in_bounds(point) && self.tiles[map_idx(point.x, point.y)] == TileType::Floor
+        self.in_bounds(point)
+            && (self.tiles[map_idx(point.x, point.y)] == TileType::Floor
+                || self.tiles[map_idx(point.x, point.y)] == TileType::Exit)
     }
 
     fn valid_exit(&self, loc: Point, delta: Point) -> Option<usize> {
@@ -284,7 +287,12 @@ pub fn move_sprite(tilemap: &mut Tilemap, prev_pos: Point, new_pos: Point, rende
 
 pub fn make_tilemap(texture_atlas: Handle<TextureAtlas>) -> (Tilemap, MapBuilder) {
     let mut rng = rand::thread_rng();
-    let map_builder = MapBuilder::new(&mut rng);
+    let mut map_builder = MapBuilder::new(&mut rng);
+
+    let exit_idx = map_builder
+        .map_spec
+        .point2d_to_index(map_builder.amulet_start);
+    map_builder.map_spec.tiles[exit_idx] = TileType::Exit;
 
     let mut tilemap = Tilemap::builder()
         .dimensions(TILEMAP_WIDTH as u32, TILEMAP_HEIGHT as u32)

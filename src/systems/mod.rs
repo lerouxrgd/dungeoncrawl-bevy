@@ -75,7 +75,8 @@ pub fn add_systems(app: &mut AppBuilder) -> &mut AppBuilder {
             .with_system(player_input.system())
             .with_system(map_render.system())
             .with_system(main_hud.system())
-            .with_system(inventory_hud.system()),
+            .with_system(inventory_hud.system())
+            .with_system(level_hud.system()),
     );
 
     app.add_system_set_to_stage(
@@ -100,6 +101,17 @@ pub fn add_systems(app: &mut AppBuilder) -> &mut AppBuilder {
     app.add_system_set_to_stage(
         GameStage::MonsterTurn,
         SystemSet::on_enter(TurnState::AwaitingInput).with_system(fov.system()),
+    );
+
+    // Next level systems
+
+    app.add_system_set_to_stage(
+        GameStage::MonsterTurn,
+        SystemSet::on_enter(TurnState::NextLevel).with_system(despawn_level.system()),
+    );
+    app.add_system_set_to_stage(
+        GameStage::MonsterTurn,
+        SystemSet::on_exit(TurnState::NextLevel).with_system(respawn_level.system()),
     );
 
     // Victory systems

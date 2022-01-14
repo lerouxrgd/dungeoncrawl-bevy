@@ -1,6 +1,7 @@
 use crate::prelude::*;
 
 pub fn end_turn(
+    map_spec: Res<MapSpec>,
     mut turn_state: ResMut<State<TurnState>>,
     player_query: Query<(&Point, &Health), With<Player>>,
     amulet_query: Query<&Point, With<AmuletOfYala>>,
@@ -18,9 +19,15 @@ pub fn end_turn(
         new_state = TurnState::GameOver;
     }
 
-    let amulet_pos = amulet_query.single().unwrap();
+    let amulet_default = Point::new(-1, -1);
+    let amulet_pos = amulet_query.single().unwrap_or(&amulet_default);
     if player_pos == amulet_pos {
         new_state = TurnState::Victory;
+    }
+
+    let idx = map_idx(player_pos.x, player_pos.y);
+    if map_spec.tiles[idx] == TileType::Exit {
+        new_state = TurnState::NextLevel;
     }
 
     if &new_state != turn_state.current() {

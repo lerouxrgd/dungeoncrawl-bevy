@@ -63,7 +63,14 @@ pub fn main_hud(
 pub fn inventory_hud(
     windows: Res<Windows>,
     player_query: Query<Entity, With<Player>>,
-    offset_query: Query<&Text2dSize, (With<Hud>, Or<(With<Parent>, With<Children>)>)>,
+    offset_query: Query<
+        &Text2dSize,
+        (
+            With<Hud>,
+            Or<(With<Parent>, With<Children>)>,
+            Without<LevelText>,
+        ),
+    >,
     mut q: QuerySet<(
         Query<(&Transform, &OrthographicProjection), With<Camera>>,
         Query<(&mut Transform, &Text2dSize, &mut Visible), (With<Hud>, With<InventoryText>)>,
@@ -119,4 +126,25 @@ pub fn inventory_hud(
 
     let (_, _, mut visible) = q.q1_mut().single_mut().unwrap();
     visible.is_visible = nb_carried > 0;
+}
+
+pub fn level_hud(
+    windows: Res<Windows>,
+    player_query: Query<&Player>,
+    heath_text_query: Query<&Text2dSize, (With<Hud>, With<HealthText>)>,
+    mut level_text_query: Query<
+        (&mut Transform, &mut Text, &Text2dSize),
+        (With<Hud>, With<LevelText>),
+    >,
+) {
+    let window = windows.get_primary().unwrap();
+    let map_level = player_query.single().unwrap().map_level;
+    let health_height = heath_text_query.single().unwrap().size.height;
+
+    // LevelText query
+
+    let (mut transform, mut text, size) = level_text_query.single_mut().unwrap();
+    transform.translation.x = (window.width() / 2.) - size.size.width;
+    transform.translation.y = -health_height;
+    text.sections[0].value = format!("Dungeon Level: {}", map_level + 1);
 }

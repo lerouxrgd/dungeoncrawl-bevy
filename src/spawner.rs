@@ -28,7 +28,7 @@ pub fn spawn_player(commands: &mut Commands, position: Point, tilemap: &mut Tile
     let sprite_order = 3;
 
     commands.spawn().insert_bundle(PlayerBundle {
-        player: Player,
+        player: Player { map_level: 0 },
         position,
         render: Render {
             sprite_index,
@@ -157,7 +157,31 @@ pub fn spawn_magic_mapper(commands: &mut Commands, position: Point, tilemap: &mu
         .unwrap();
 }
 
-pub fn spawn_amulet_of_yala(commands: &mut Commands, position: Point, tilemap: &mut Tilemap) {
+pub fn spawn_amulet_of_yala(
+    commands: &mut Commands,
+    position: Point,
+    tilemap: &mut Tilemap,
+    map_spec: &mut MapSpec,
+    theme: &dyn MapTheme,
+) {
+    // Clean exit tile
+
+    let exit_idx = map_spec.point2d_to_index(position);
+    map_spec.tiles[exit_idx] = TileType::Floor;
+
+    let tilemap_position = (position.x - CAMERA_OFFSET_X, position.y - CAMERA_OFFSET_Y);
+    tilemap.clear_tile(tilemap_position, 0).unwrap();
+    tilemap
+        .insert_tile(Tile {
+            point: tilemap_position,
+            sprite_index: theme.tile_to_render(TileType::Floor),
+            sprite_order: 0,
+            tint: Color::WHITE,
+        })
+        .unwrap();
+
+    // Spawn amulet instead
+
     let sprite_index = to_cp437('|');
     let sprite_order = 2;
 
@@ -233,6 +257,25 @@ pub fn spawn_hud(commands: &mut Commands, font_handle: Handle<Font>) {
                 })
                 .insert(Hud)
                 .insert(InfoText);
+
+            parent
+                .spawn_bundle(Text2dBundle {
+                    text: Text::with_section(
+                        "Dungeon Level: {}",
+                        TextStyle {
+                            font: font_handle.clone(),
+                            font_size: 10.0,
+                            color: Color::YELLOW,
+                        },
+                        TextAlignment {
+                            vertical: VerticalAlign::Bottom,
+                            horizontal: HorizontalAlign::Right,
+                        },
+                    ),
+                    ..Default::default()
+                })
+                .insert(Hud)
+                .insert(LevelText);
         });
 
     commands

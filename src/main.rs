@@ -80,7 +80,6 @@ fn setup(
     let (mut tilemap, map_builder) = make_tilemap(texture_atlas_handle.clone());
     let MapBuilder {
         player_start,
-        amulet_start,
         monster_spawns,
         map_spec,
         ..
@@ -91,7 +90,6 @@ fn setup(
     // Spawn entities
 
     spawn_player(&mut commands, player_start, &mut tilemap);
-    spawn_amulet_of_yala(&mut commands, amulet_start, &mut tilemap);
     monster_spawns
         .into_iter()
         .for_each(|pos| spawn_entity(&mut commands, pos, &mut tilemap));

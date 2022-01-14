@@ -3,7 +3,9 @@ use std::collections::HashSet;
 use crate::prelude::*;
 
 #[derive(Default)]
-pub struct Player;
+pub struct Player {
+    pub map_level: u32,
+}
 
 #[derive(Bundle)]
 pub struct PlayerBundle {
@@ -90,6 +92,9 @@ pub struct HealthBar;
 
 #[derive(Default)]
 pub struct InfoText;
+
+#[derive(Default)]
+pub struct LevelText;
 
 #[derive(Default)]
 pub struct TooltipText;
