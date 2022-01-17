@@ -266,7 +266,7 @@ dependencies = [
  "notify",
  "parking_lot",
  "rand 0.7.3",
- "ron",
+ "ron 0.6.5",
  "serde",
  "thiserror",
  "wasm-bindgen",
@@ -295,7 +295,7 @@ dependencies = [
  "notify",
  "parking_lot",
  "rand 0.8.4",
- "ron",
+ "ron 0.6.5",
  "serde",
  "thiserror",
  "wasm-bindgen",
@@ -757,7 +757,7 @@ dependencies = [
  "bevy_transform 0.5.0",
  "bevy_utils 0.5.0",
  "parking_lot",
- "ron",
+ "ron 0.6.5",
  "serde",
  "thiserror",
  "uuid",
@@ -1559,6 +1559,8 @@ dependencies = [
  "bracket-pathfinding",
  "lyon_tessellation",
  "rand 0.8.4",
+ "ron 0.7.0",
+ "serde",
 ]
 
 [[package]]
@@ -3166,6 +3168,17 @@ name = "ron"
 version = "0.6.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "45005aa836116903a49cf3461474da697cfe66221762c6e95871092009ec86d6"
+dependencies = [
+ "base64",
+ "bitflags",
+ "serde",
+]
+
+[[package]]
+name = "ron"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1b861ecaade43ac97886a512b360d01d66be9f41f3c61088b42cedf92e03d678"
 dependencies = [
  "base64",
  "bitflags",

@@ -1,0 +1,43 @@
+Templates(
+    entities : [
+        Template(
+            entity_type: Item,
+            name : "Healing Potion", levels : [ 0, 1, 2 ],
+            glyph : '!', sprite_order: 2,
+            provides: Some([ ("Healing", 6) ]),
+            frequency: 2
+        ),
+
+        Template(
+            entity_type: Item,
+            name : "Weak Healing Potion", levels : [ 0, 1, 2 ],
+            glyph : '!', sprite_order: 2,
+            provides: Some([ ("Healing", 2) ]),
+            frequency: 2
+        ),
+
+        Template(
+            entity_type: Item,
+            name : "Dungeon Map", levels : [ 0, 1, 2 ],
+            glyph : '{', sprite_order: 2,
+            provides: Some([ ("MagicMap", 0) ]),
+            frequency: 1
+        ),
+
+        Template(
+            entity_type: Enemy,
+            name : "Goblin", levels : [ 0, 1, 2 ],
+            glyph : 'g', sprite_order: 1,
+            hp : Some(1),
+            frequency: 3
+        ),
+
+        Template(
+            entity_type: Enemy,
+            name : "Orc", levels : [ 0, 1, 2 ],
+            glyph : 'o', sprite_order: 1,
+            hp : Some(2),
+            frequency: 2
+        ),
+    ],
+)

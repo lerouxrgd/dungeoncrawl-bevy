@@ -19,17 +19,6 @@ pub struct PlayerBundle {
 #[derive(Default)]
 pub struct Enemy;
 
-#[derive(Bundle)]
-pub struct EnemyBundle {
-    pub enemy: Enemy,
-    pub position: Point,
-    pub render: Render,
-    pub chasing_player: ChasingPlayer,
-    pub health: Health,
-    pub name: Name,
-    pub fov: FieldOfView,
-}
-
 #[derive(Default)]
 pub struct Health {
     pub current: i32,
@@ -161,14 +150,6 @@ pub struct InventoryText;
 
 #[derive(Default)]
 pub struct Item;
-
-#[derive(Bundle)]
-pub struct ItemBundle {
-    pub item: Item,
-    pub position: Point,
-    pub render: Render,
-    pub name: Name,
-}
 
 #[derive(Default)]
 pub struct AmuletOfYala;

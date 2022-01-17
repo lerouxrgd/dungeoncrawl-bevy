@@ -1,3 +1,5 @@
+mod template;
+
 use crate::prelude::*;
 
 pub fn spawn_tilemap(commands: &mut Commands, tilemap: Tilemap) {
@@ -51,110 +53,14 @@ pub fn spawn_player(commands: &mut Commands, position: Point, tilemap: &mut Tile
         .unwrap();
 }
 
-pub fn spawn_entity(commands: &mut Commands, position: Point, tilemap: &mut Tilemap) {
-    let mut rng = rand::thread_rng();
-    let roll = rng.gen_range(1..=6);
-    match roll {
-        1 => spawn_healing_potion(commands, position, tilemap),
-        2 => spawn_magic_mapper(commands, position, tilemap),
-        _ => spawn_monster(commands, position, tilemap),
-    }
-}
-
-pub fn spawn_monster(commands: &mut Commands, position: Point, tilemap: &mut Tilemap) {
-    fn goblin() -> (i32, String, usize) {
-        (1, "Goblin".to_string(), to_cp437('g'))
-    }
-
-    fn orc() -> (i32, String, usize) {
-        (2, "Orc".to_string(), to_cp437('o'))
-    }
-
-    let mut rng = rand::thread_rng();
-    let (hp, name, sprite_index) = match rng.gen_range(1..=10) {
-        1..=8 => goblin(),
-        _ => orc(),
-    };
-    let sprite_order = 1;
-
-    commands.spawn().insert_bundle(EnemyBundle {
-        enemy: Enemy,
-        position,
-        render: Render {
-            sprite_index,
-            sprite_order,
-        },
-        chasing_player: ChasingPlayer,
-        health: Health {
-            current: hp,
-            max: hp,
-        },
-        name: Name(name),
-        fov: FieldOfView::new(6),
-    });
-
-    tilemap
-        .insert_tile(Tile {
-            point: (position.x - CAMERA_OFFSET_X, position.y - CAMERA_OFFSET_Y),
-            sprite_index,
-            sprite_order,
-            tint: Color::WHITE,
-        })
-        .unwrap();
-}
-
-pub fn spawn_healing_potion(commands: &mut Commands, position: Point, tilemap: &mut Tilemap) {
-    let sprite_index = to_cp437('!');
-    let sprite_order = 2;
-
-    commands
-        .spawn()
-        .insert_bundle(ItemBundle {
-            item: Item,
-            position,
-            render: Render {
-                sprite_index,
-                sprite_order,
-            },
-            name: Name("Healing Potion".to_string()),
-        })
-        .insert(ProvidesHealing { amount: 6 });
-
-    tilemap
-        .insert_tile(Tile {
-            point: (position.x - CAMERA_OFFSET_X, position.y - CAMERA_OFFSET_Y),
-            sprite_index,
-            sprite_order,
-            tint: Color::WHITE,
-        })
-        .unwrap();
-}
-
-pub fn spawn_magic_mapper(commands: &mut Commands, position: Point, tilemap: &mut Tilemap) {
-    let sprite_index = to_cp437('{');
-    let sprite_order = 2;
-
-    commands
-        .spawn()
-        .insert_bundle(ItemBundle {
-            item: Item,
-            position,
-            render: Render {
-                sprite_index,
-                sprite_order,
-            },
-            name: Name("Dungeon Map".to_string()),
-        })
-        .insert(ProvidesDungeonMap);
-
-    tilemap
-        .insert_tile(Tile {
-            point: (position.x - CAMERA_OFFSET_X, position.y - CAMERA_OFFSET_Y),
-            sprite_index,
-            sprite_order,
-            tint: Color::WHITE,
-        })
-        .unwrap();
+pub fn spawn_level(
+    level: usize,
+    commands: &mut Commands,
+    spawn_points: &[Point],
+    tilemap: &mut Tilemap,
+) {
+    let template = template::Templates::load();
+    template.spawn_entities(level, commands, spawn_points, tilemap);
 }
 
 pub fn spawn_amulet_of_yala(
@@ -187,16 +93,14 @@ pub fn spawn_amulet_of_yala(
 
     commands
         .spawn()
-        .insert_bundle(ItemBundle {
-            position,
-            render: Render {
-                sprite_index,
-                sprite_order,
-            },
-            name: Name("Amulet of Yala".to_string()),
-            item: Item,
+        .insert(Item)
+        .insert(AmuletOfYala)
+        .insert(position)
+        .insert(Render {
+            sprite_index,
+            sprite_order,
         })
-        .insert(AmuletOfYala);
+        .insert(Name("Amulet of Yala".to_string()));
 
     tilemap
         .insert_tile(Tile {

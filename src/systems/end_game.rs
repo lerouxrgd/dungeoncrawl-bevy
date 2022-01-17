@@ -75,10 +75,12 @@ pub fn respawn_level(
     }
     commands.insert_resource(map_spec);
 
-    monster_spawns
-        .into_iter()
-        .for_each(|pos| spawn_entity(&mut commands, pos, &mut tilemap));
-
+    spawn_level(
+        player.map_level as usize,
+        &mut commands,
+        &monster_spawns,
+        &mut tilemap,
+    );
     spawn_hud(&mut commands, font_handle.clone());
     spawn_tilemap(&mut commands, tilemap);
 
@@ -145,11 +147,7 @@ pub fn respawn_game_state(
     // Respawn entities
 
     spawn_player(&mut commands, player_start, &mut tilemap);
-
-    monster_spawns
-        .into_iter()
-        .for_each(|pos| spawn_entity(&mut commands, pos, &mut tilemap));
-
+    spawn_level(0, &mut commands, &monster_spawns, &mut tilemap);
     spawn_hud(&mut commands, font_handle.clone());
     spawn_tilemap(&mut commands, tilemap);
 
