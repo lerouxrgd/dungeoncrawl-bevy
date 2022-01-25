@@ -9,8 +9,9 @@ pub fn player_input(
     mut commands: Commands,
     player_query: Query<(Entity, &Point), With<Player>>,
     mut tilemap_query: Query<&mut Tilemap>,
-    items_query: Query<(Entity, &Point, &Render), With<Item>>,
+    items_query: Query<(Entity, &Point, &Render, Option<&Weapon>), With<Item>>,
     carried_items_query: Query<(Entity, &Carried), With<Item>>,
+    carried_weapon_query: Query<(Entity, &Carried), With<Weapon>>,
     enemies_query: Query<(Entity, &Point), With<Enemy>>,
     font_handle: Res<Handle<Font>>,
 ) {
@@ -28,8 +29,8 @@ pub fn player_input(
             (ElementState::Pressed, Some(KeyCode::G)) => {
                 items_query
                     .iter()
-                    .filter(|(_, &item_pos, _)| item_pos == player_pos)
-                    .for_each(|(item, item_pos, item_render)| {
+                    .filter(|(_, &item_pos, _, _)| item_pos == player_pos)
+                    .for_each(|(item, item_pos, item_render, weapon)| {
                         commands.entity(item).remove::<Point>();
 
                         let mut tilemap = tilemap_query.single_mut().unwrap();
@@ -58,6 +59,15 @@ pub fn player_input(
                                 ),
                                 ..Default::default()
                             });
+
+                        if weapon.is_some() {
+                            carried_weapon_query
+                                .iter()
+                                .filter(|(_, &Carried(entity))| entity == player)
+                                .for_each(|(previous_weapon, _)| {
+                                    commands.entity(previous_weapon).despawn();
+                                });
+                        }
                     });
 
                 Point::zero()

@@ -5,7 +5,7 @@ Templates(
             name : "Healing Potion", levels : [ 0, 1, 2 ],
             glyph : '!', sprite_order: 2,
             provides: Some([ ("Healing", 6) ]),
-            frequency: 2
+            frequency: 2,
         ),
 
         Template(
@@ -13,7 +13,7 @@ Templates(
             name : "Weak Healing Potion", levels : [ 0, 1, 2 ],
             glyph : '!', sprite_order: 2,
             provides: Some([ ("Healing", 2) ]),
-            frequency: 2
+            frequency: 2,
         ),
 
         Template(
@@ -21,15 +21,40 @@ Templates(
             name : "Dungeon Map", levels : [ 0, 1, 2 ],
             glyph : '{', sprite_order: 2,
             provides: Some([ ("MagicMap", 0) ]),
-            frequency: 1
+            frequency: 1,
+        ),
+
+        Template(
+            entity_type: Item,
+            name : "Rusty Sword", levels : [ 0, 1, 2 ],
+            glyph : 's', sprite_order: 2,
+            frequency: 1,
+            base_damage: Some(1),
+        ),
+
+        Template(
+            entity_type: Item,
+            name : "Shiny Sword", levels: [ 0, 1, 2 ],
+            glyph: 'S', sprite_order: 2,
+            frequency: 1,
+            base_damage: Some(2)
+        ),
+
+        Template(
+            entity_type: Item,
+            name : "Huge Sword", levels: [ 1, 2 ],
+            glyph: '/', sprite_order: 2,
+            frequency: 1,
+            base_damage: Some(3)
         ),
 
         Template(
             entity_type: Enemy,
-            name : "Goblin", levels : [ 0, 1, 2 ],
+            name : "Goblin", levels : [ 0 ],
             glyph : 'g', sprite_order: 1,
             hp : Some(1),
-            frequency: 3
+            frequency: 3,
+            base_damage: Some(1),
         ),
 
         Template(
@@ -37,7 +62,26 @@ Templates(
             name : "Orc", levels : [ 0, 1, 2 ],
             glyph : 'o', sprite_order: 1,
             hp : Some(2),
-            frequency: 2
+            frequency: 2,
+            base_damage: Some(1),
+        ),
+
+        Template(
+            entity_type: Enemy,
+            name : "Ogre", levels : [ 1, 2 ],
+            glyph : 'O', sprite_order: 1,
+            hp : Some(5),
+            frequency: 1,
+            base_damage: Some(2),
+        ),
+
+        Template(
+            entity_type: Enemy,
+            name : "Ettin", levels : [ 2 ],
+            hp : Some(10),
+            glyph : 'E', sprite_order: 1,
+            frequency: 1,
+            base_damage: Some(3),
         ),
     ],
 )

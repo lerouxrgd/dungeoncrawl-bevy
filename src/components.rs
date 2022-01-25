@@ -14,6 +14,7 @@ pub struct PlayerBundle {
     pub render: Render,
     pub health: Health,
     pub fov: FieldOfView,
+    pub damage: Damage,
 }
 
 #[derive(Default)]
@@ -24,6 +25,9 @@ pub struct Health {
     pub current: i32,
     pub max: i32,
 }
+
+#[derive(Default)]
+pub struct Damage(pub i32);
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct FieldOfView {
@@ -153,6 +157,9 @@ pub struct Item;
 
 #[derive(Default)]
 pub struct AmuletOfYala;
+
+#[derive(Default)]
+pub struct Weapon;
 
 #[derive(Default)]
 pub struct ProvidesHealing {

@@ -41,6 +41,7 @@ pub fn spawn_player(commands: &mut Commands, position: Point, tilemap: &mut Tile
             max: 10,
         },
         fov: FieldOfView::new(6),
+        damage: Damage(1),
     });
 
     tilemap

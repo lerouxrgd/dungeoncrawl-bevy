@@ -21,6 +21,7 @@ pub struct Template {
     pub sprite_order: usize,
     pub provides: Option<Vec<(String, i32)>>,
     pub hp: Option<i32>,
+    pub base_damage: Option<i32>,
 }
 
 #[derive(Clone, Deserialize, Debug, PartialEq)]
@@ -108,6 +109,13 @@ impl Templates {
                         println!("Warning: we don't know how to provide {}", provides);
                     }
                 });
+        }
+
+        if let Some(damage) = template.base_damage {
+            entity.insert(Damage(damage));
+            if template.entity_type == EntityType::Item {
+                entity.insert(Weapon);
+            }
         }
 
         tilemap
